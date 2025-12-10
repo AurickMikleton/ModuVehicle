@@ -4,3 +4,5 @@
 
 [node name="Node" type="Node"]
 script = ExtResource("1_jdh55")
+
+[node name="MoVeCar" type="MoVeCar" parent="."]

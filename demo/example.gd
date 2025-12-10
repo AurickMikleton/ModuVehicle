@@ -10,4 +10,3 @@ func _ready() -> void:
 	wheel.add(3)
 	wheel.add(4)
 	print(wheel.get_total())
-	
