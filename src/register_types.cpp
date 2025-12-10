@@ -5,7 +5,6 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "example_class.h"
 #include "wheel.hpp"
 #include "car.hpp"
 
@@ -16,8 +15,7 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level)
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
 		return;
 	}
-	GDREGISTER_CLASS(ExampleClass);
-	GDREGISTER_CLASS(ModuWheel);
+	GDREGISTER_CLASS(MoVeWheel);
 	GDREGISTER_CLASS(MoVeCar);
 }
 

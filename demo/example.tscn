@@ -1,8 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene format=3 uid="uid://dh0oj81pufivs"]
 
-[ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://example.gd" id="1_jdh55"]
-
-[node name="Node" type="Node"]
-script = ExtResource("1_jdh55")
+[node name="Node3D" type="Node3D"]
 
 [node name="MoVeCar" type="MoVeCar" parent="."]
+
+[node name="MoVeWheel" type="MoVeWheel" parent="MoVeCar"]
+
+[node name="MoVeWheel2" type="MoVeWheel" parent="MoVeCar"]
+
+[node name="MoVeWheel3" type="MoVeWheel" parent="MoVeCar"]
+
+[node name="MoVeWheel4" type="MoVeWheel" parent="MoVeCar"]
