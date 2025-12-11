@@ -7,6 +7,7 @@
 
 #include "wheel.hpp"
 #include "car.hpp"
+#include "engine.hpp"
 
 using namespace godot;
 
@@ -17,6 +18,7 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level)
 	}
 	GDREGISTER_CLASS(MoVeWheel);
 	GDREGISTER_CLASS(MoVeCar);
+	GDREGISTER_CLASS(MoVeEngine);
 }
 
 void uninitialize_gdextension_types(ModuleInitializationLevel p_level) {
