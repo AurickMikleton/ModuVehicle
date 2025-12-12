@@ -36,16 +36,27 @@ public:
 
     double engine_torque(double rpm);
 
-    // setters / getters
-    void set_bore(double value);
-	double get_bore() const;
+    // Size
+    void set_bore(double v); double get_bore() const;
+    void set_stroke(double v); double get_stroke() const;
+    void set_cylinders(int v); int get_cylinders() const;
 
-    void set_stroke(double value);
-	double get_stroke() const;
+    // Torque curve
+    void set_peak_rpm_base(double v); double get_peak_rpm_base() const;
+    void set_sigma_left(double v); double get_sigma_left() const;
+    void set_sigma_right(double v); double get_sigma_right() const;
 
-    void set_cylinders(int value);
-	int get_cylinders() const;
+    // Turbo
+    void set_wastegate_bar(double v); double get_wastegate_bar() const;
+    void set_spool_rpm(double v); double get_spool_rpm() const;
+    void set_spool_k(double v); double get_spool_k() const;
 
-    //void set_peak_rpm_base(double value);
-	//double get_peak_rpm_base() const;
+    // Idle / Braking
+    void set_idle_rpm(double v); double get_idle_rpm() const;
+    void set_brake_base(double v); double get_brake_base() const;
+    void set_brake_exp(double v); double get_brake_exp() const;
+
+    // Redline + Throttle
+    void set_redline_rpm(double v); double get_redline_rpm() const;
+    void set_throttle(double v); double get_throttle() const;
 };

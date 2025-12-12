@@ -1,5 +1,7 @@
 #include "engine.hpp"
 
+//#include "godot_cpp/variant/utility_functions.hpp"
+
 using namespace godot;
 
 double MoVeEngine::engine_torque(double rpm) {
@@ -8,7 +10,7 @@ double MoVeEngine::engine_torque(double rpm) {
     // displacement in liters
     const double pi = 3.14159265;
     double displacement_m3 = (pi / 4.0) * m_bore * m_bore * m_stroke * m_cylinders;
-    double displacement_l = displacement_m3 * 1000.0;
+    double displacement_l = displacement_m3 / 1000000.0;
 
     // naturally aspirated peak torque
     double torque_peak = k_nm_per_liter * displacement_l;
@@ -69,28 +71,108 @@ MoVeEngine::MoVeEngine() {
     m_throttle = 1.0;
 }
 
-void MoVeEngine::set_bore(double value) {m_bore = value;}
-double MoVeEngine::get_bore() const {return m_bore;}
+void MoVeEngine::set_bore(double v) { m_bore = v; }
+double MoVeEngine::get_bore() const { return m_bore; }
 
-void MoVeEngine::set_stroke(double value) {m_stroke = value;}
-double MoVeEngine::get_stroke() const {return m_stroke;}
+void MoVeEngine::set_stroke(double v) { m_stroke = v; }
+double MoVeEngine::get_stroke() const { return m_stroke; }
 
-void MoVeEngine::set_cylinders(int value) {m_cylinders = value;}
-int MoVeEngine::get_cylinders() const {return m_cylinders;}
+void MoVeEngine::set_cylinders(int v) { m_cylinders = v; }
+int MoVeEngine::get_cylinders() const { return m_cylinders; }
+
+void MoVeEngine::set_peak_rpm_base(double v) { m_peak_rpm_base = v; }
+double MoVeEngine::get_peak_rpm_base() const { return m_peak_rpm_base; }
+
+void MoVeEngine::set_sigma_left(double v) { m_sigma_left = v; }
+double MoVeEngine::get_sigma_left() const { return m_sigma_left; }
+
+void MoVeEngine::set_sigma_right(double v) { m_sigma_right = v; }
+double MoVeEngine::get_sigma_right() const { return m_sigma_right; }
+
+void MoVeEngine::set_idle_rpm(double v) { m_idle_rpm = v; }
+double MoVeEngine::get_idle_rpm() const { return m_idle_rpm; }
+
+void MoVeEngine::set_redline_rpm(double v) { m_redline_rpm = v; }
+double MoVeEngine::get_redline_rpm() const { return m_redline_rpm; }
+
+void MoVeEngine::set_brake_base(double v) { m_brake_base = v; }
+double MoVeEngine::get_brake_base() const { return m_brake_base; }
+
+void MoVeEngine::set_brake_exp(double v) { m_brake_exp = v; }
+double MoVeEngine::get_brake_exp() const { return m_brake_exp; }
+
+void MoVeEngine::set_wastegate_bar(double v) { m_wastegate_bar = v; }
+double MoVeEngine::get_wastegate_bar() const { return m_wastegate_bar; }
+
+void MoVeEngine::set_spool_rpm(double v) { m_spool_rpm = v; }
+double MoVeEngine::get_spool_rpm() const { return m_spool_rpm; }
+
+void MoVeEngine::set_spool_k(double v) { m_spool_k = v; }
+double MoVeEngine::get_spool_k() const { return m_spool_k; }
+
+void MoVeEngine::set_throttle(double v) { m_throttle = v; }
+double MoVeEngine::get_throttle() const { return m_throttle; }
 
 
 void MoVeEngine::_bind_methods() {
+    // Methods
     ClassDB::bind_method(D_METHOD("engine_torque", "rpm"), &MoVeEngine::engine_torque);
-    // setters getters
-    ClassDB::bind_method(D_METHOD("set_bore"), &MoVeEngine::set_bore);
+
+    // Parameters
+    ClassDB::bind_method(D_METHOD("set_bore", "value"), &MoVeEngine::set_bore);
     ClassDB::bind_method(D_METHOD("get_bore"), &MoVeEngine::get_bore);
-    ClassDB::bind_method(D_METHOD("set_stroke"), &MoVeEngine::set_stroke);
+    ClassDB::bind_method(D_METHOD("set_stroke", "value"), &MoVeEngine::set_stroke);
     ClassDB::bind_method(D_METHOD("get_stroke"), &MoVeEngine::get_stroke);
-    ClassDB::bind_method(D_METHOD("set_cylinders"), &MoVeEngine::set_cylinders);
+    ClassDB::bind_method(D_METHOD("set_cylinders", "value"), &MoVeEngine::set_cylinders);
     ClassDB::bind_method(D_METHOD("get_cylinders"), &MoVeEngine::get_cylinders);
 
     ADD_GROUP("Size", "");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "bore", PROPERTY_HINT_RANGE, "0,120,0.01"), "set_bore", "get_bore");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stroke", PROPERTY_HINT_RANGE, "0,120,0.01"), "set_stroke", "get_stroke");
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "cylinders", PROPERTY_HINT_RANGE, "0,16,1"), "set_cylinders", "get_cylinders");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "bore", PROPERTY_HINT_RANGE, "0,200,0.01"), "set_bore", "get_bore");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stroke", PROPERTY_HINT_RANGE, "0,200,0.01"), "set_stroke", "get_stroke");
+    ADD_PROPERTY(PropertyInfo(Variant::INT,   "cylinders", PROPERTY_HINT_RANGE, "1,16,1"), "set_cylinders", "get_cylinders");
+
+    ClassDB::bind_method(D_METHOD("set_peak_rpm_base", "value"), &MoVeEngine::set_peak_rpm_base);
+    ClassDB::bind_method(D_METHOD("get_peak_rpm_base"), &MoVeEngine::get_peak_rpm_base);
+    ClassDB::bind_method(D_METHOD("set_sigma_left", "value"), &MoVeEngine::set_sigma_left);
+    ClassDB::bind_method(D_METHOD("get_sigma_left"), &MoVeEngine::get_sigma_left);
+    ClassDB::bind_method(D_METHOD("set_sigma_right", "value"), &MoVeEngine::set_sigma_right);
+    ClassDB::bind_method(D_METHOD("get_sigma_right"), &MoVeEngine::get_sigma_right);
+
+    ADD_GROUP("Torque Curve", "");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "peak_rpm_base", PROPERTY_HINT_RANGE, "500,12000,1"), "set_peak_rpm_base", "get_peak_rpm_base");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "sigma_left", PROPERTY_HINT_RANGE, "0,3000,1"), "set_sigma_left", "get_sigma_left");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "sigma_right", PROPERTY_HINT_RANGE, "0,3000,1"), "set_sigma_right", "get_sigma_right");
+
+    ClassDB::bind_method(D_METHOD("set_wastegate_bar", "value"), &MoVeEngine::set_wastegate_bar);
+    ClassDB::bind_method(D_METHOD("get_wastegate_bar"), &MoVeEngine::get_wastegate_bar);
+    ClassDB::bind_method(D_METHOD("set_spool_rpm", "value"), &MoVeEngine::set_spool_rpm);
+    ClassDB::bind_method(D_METHOD("get_spool_rpm"), &MoVeEngine::get_spool_rpm);
+    ClassDB::bind_method(D_METHOD("set_spool_k", "value"), &MoVeEngine::set_spool_k);
+    ClassDB::bind_method(D_METHOD("get_spool_k"), &MoVeEngine::get_spool_k);
+
+    ADD_GROUP("Turbo", "");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "wastegate_bar", PROPERTY_HINT_RANGE, "0,3,0.01"), "set_wastegate_bar", "get_wastegate_bar");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spool_rpm", PROPERTY_HINT_RANGE, "0,20000,1"), "set_spool_rpm", "get_spool_rpm");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spool_k", PROPERTY_HINT_RANGE, "0,2000,1"), "set_spool_k", "get_spool_k");
+
+    ClassDB::bind_method(D_METHOD("set_idle_rpm", "value"), &MoVeEngine::set_idle_rpm);
+    ClassDB::bind_method(D_METHOD("get_idle_rpm"), &MoVeEngine::get_idle_rpm);
+    ClassDB::bind_method(D_METHOD("set_brake_base", "value"), &MoVeEngine::set_brake_base);
+    ClassDB::bind_method(D_METHOD("get_brake_base"), &MoVeEngine::get_brake_base);
+    ClassDB::bind_method(D_METHOD("set_brake_exp", "value"), &MoVeEngine::set_brake_exp);
+    ClassDB::bind_method(D_METHOD("get_brake_exp"), &MoVeEngine::get_brake_exp);
+
+    ADD_GROUP("Idle & Engine Braking", "");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "idle_rpm", PROPERTY_HINT_RANGE, "300,3000,1"), "set_idle_rpm", "get_idle_rpm");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "brake_base", PROPERTY_HINT_RANGE, "0,200,0.1"), "set_brake_base", "get_brake_base");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "brake_exp", PROPERTY_HINT_RANGE, "0.1,5,0.01"), "set_brake_exp", "get_brake_exp");
+
+    ClassDB::bind_method(D_METHOD("set_redline_rpm", "value"), &MoVeEngine::set_redline_rpm);
+    ClassDB::bind_method(D_METHOD("get_redline_rpm"), &MoVeEngine::get_redline_rpm);
+    ClassDB::bind_method(D_METHOD("set_throttle", "value"), &MoVeEngine::set_throttle);
+    ClassDB::bind_method(D_METHOD("get_throttle"), &MoVeEngine::get_throttle);
+
+    ADD_GROUP("Operation", "");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "redline_rpm", PROPERTY_HINT_RANGE, "1000,20000,1"), "set_redline_rpm", "get_redline_rpm");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "throttle", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_throttle", "get_throttle");
 }
