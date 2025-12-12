@@ -19,8 +19,6 @@ private:
     double m_sigma_right;     // arbitrary
     double m_idle_rpm;
     double m_redline_rpm; // nvm
-    double m_brake_base;       // Nm of braking at idle RPM
-    double m_brake_exp; 
     double m_friction_coeff; // Nm per 1000 rpm 
     double m_inertia = 0.15f;
     //turbo
@@ -36,6 +34,7 @@ private:
     double limiter_cut_ratio = 0.5f; // fraction of cycle spent cutting
 //const
     static constexpr double k_nm_per_liter = 120.0f; // newton meters per liter constant
+    static constexpr double pi = 3.14159265;
 //members
     double m_throttle;
     double m_current_rpm;
@@ -65,12 +64,8 @@ public:
     void set_spool_rpm(double v); double get_spool_rpm() const;
     void set_spool_k(double v); double get_spool_k() const;
 
-    // Idle / Braking
+    // Idle + Redline + Throttle
     void set_idle_rpm(double v); double get_idle_rpm() const;
-    void set_brake_base(double v); double get_brake_base() const;
-    void set_brake_exp(double v); double get_brake_exp() const;
-
-    // Redline + Throttle
     void set_redline_rpm(double v); double get_redline_rpm() const;
     void set_throttle(double v); double get_throttle() const;
 
