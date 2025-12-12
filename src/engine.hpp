@@ -18,23 +18,37 @@ private:
     double m_sigma_left;      // arbitrary
     double m_sigma_right;     // arbitrary
     double m_idle_rpm;
-    double m_redline_rpm;
+    double m_redline_rpm; // nvm
     double m_brake_base;       // Nm of braking at idle RPM
     double m_brake_exp; 
+    double m_friction_coeff; // Nm per 1000 rpm 
+    double m_inertia = 0.15f;
     //turbo
     double m_wastegate_bar;   // max boost in bar
     double m_spool_rpm;        // rpm, turbo reaches efficiency island
     double m_spool_k;         // arbitrary
+    // rev limiter (bouncy / 2-step)
+    double rev_limit_rpm = 7000.0f;
+    double rev_soft_zone = 150.0f;
+    bool limiter_active = false;
+    double limiter_timer = 0.0f;
+    double limiter_cycle_period = 0.08f; // seconds
+    double limiter_cut_ratio = 0.5f; // fraction of cycle spent cutting
 //const
     static constexpr double k_nm_per_liter = 120.0f; // newton meters per liter constant
 //members
     double m_throttle;
+    double m_current_rpm;
+private:
+    double displacement_liters() const;
+    double get_load_torque(double in_rpm) const ;
 protected:
     static void _bind_methods();
 public:
     MoVeEngine();
 
     double engine_torque(double rpm);
+    void update_rpm(double delta);
 
     // Size
     void set_bore(double v); double get_bore() const;
@@ -59,4 +73,8 @@ public:
     // Redline + Throttle
     void set_redline_rpm(double v); double get_redline_rpm() const;
     void set_throttle(double v); double get_throttle() const;
+
+    //misc
+    void set_friction_coeff(double v); double get_friction_coeff() const;
+    void set_current_rpm(double v); double get_current_rpm() const;
 };

@@ -4,13 +4,21 @@
 
 using namespace godot;
 
-double MoVeEngine::engine_torque(double rpm) {
-    //throttle = fmax(0.0, fmin(throttle, 1.0)); // clamp throttle percentage, to be put elsewhere
-
-    // displacement in liters
-    const double pi = 3.14159265;
+double MoVeEngine::displacement_liters() const {
+    constexpr double pi = 3.14159265;
     double displacement_m3 = (pi / 4.0) * m_bore * m_bore * m_stroke * m_cylinders;
     double displacement_l = displacement_m3 / 1000000.0;
+    return displacement_l;
+}
+
+double MoVeEngine::get_load_torque(double rpm) const {
+    // simple speed-proportional load
+    return 5.0 + m_friction_coeff * (rpm / 1000.0); // base + friction
+}
+
+double MoVeEngine::engine_torque(double rpm) {
+    // displacement in liters
+    double displacement_l = MoVeEngine::displacement_liters();
 
     // naturally aspirated peak torque
     double torque_peak = k_nm_per_liter * displacement_l;
@@ -38,20 +46,38 @@ double MoVeEngine::engine_torque(double rpm) {
     double p = 1.0 + 2.0 * (rpm / m_redline_rpm);
     double throttle_factor = a * m_throttle + (1.0 - a) * pow(m_throttle, p);
 
-    double torque_output = torque_turbo_full * throttle_factor;
+    double torque_output = torque_turbo_full * m_throttle;
 
     // engine braking below 5% throttle
-    if (m_throttle < 0.05f) {
-        double braking_ratio = rpm / m_idle_rpm;
-        float torque_brake = -m_brake_base * pow(braking_ratio, m_brake_exp);
-        torque_output += torque_brake;
-    }
+    //if (m_throttle < 0.05f) {
+    //    double braking_ratio = rpm / m_idle_rpm;
+    //    float torque_brake = -m_brake_base * pow(braking_ratio, m_brake_exp);
+    //    torque_output += torque_brake;
+    //}
 
     // set approx 0 to 0
-    if (rpm < m_idle_rpm * 0.3f)
-        torque_output = 0.0f;
+    //if (rpm < m_idle_rpm * 0.3f)
+    //    torque_output = 0.0f;
 
-    return torque_output;
+    return torque_output; // Nm
+}
+
+void MoVeEngine::update_rpm(double delta) {
+    constexpr double pi = 3.14159265;
+    // get torque values
+    double torque = engine_torque(m_current_rpm);
+    double torque_load = get_load_torque(m_current_rpm);
+    double torque_net = torque - torque_load;
+    // alpha = torque_net / I ; omega_new = omega + alpha*dt
+    double omega = m_current_rpm * (2.0f * pi / 60.0f);
+    double alpha = torque_net / m_inertia;
+    omega += alpha * delta;
+    
+    if (omega < 0.0f) omega = 0.0f;
+    m_current_rpm = omega * (60.0 / (2.0 * pi));
+    if (m_current_rpm < m_idle_rpm) m_current_rpm = m_idle_rpm;
+    
+    if (m_current_rpm > m_redline_rpm * 1.05f) m_current_rpm = m_redline_rpm * 1.05f;
 }
 
 MoVeEngine::MoVeEngine() {
@@ -67,7 +93,10 @@ MoVeEngine::MoVeEngine() {
     m_idle_rpm = 900.0;
     m_brake_base = 25.0;           // Nm of braking at idle RPM
     m_brake_exp = 1.4;             // braking curve exponent
+    m_friction_coeff = 8.0f; // Nm per 1000 rpm
     m_redline_rpm = 7000.0;
+    m_current_rpm = 900.0;
+    // state
     m_throttle = 1.0;
 }
 
@@ -110,13 +139,19 @@ double MoVeEngine::get_spool_rpm() const { return m_spool_rpm; }
 void MoVeEngine::set_spool_k(double v) { m_spool_k = v; }
 double MoVeEngine::get_spool_k() const { return m_spool_k; }
 
-void MoVeEngine::set_throttle(double v) { m_throttle = v; }
+void MoVeEngine::set_throttle(double v) { m_throttle = fmax(0.0, fmin(v, 1.0)); }
 double MoVeEngine::get_throttle() const { return m_throttle; }
 
+void MoVeEngine::set_friction_coeff(double v) { m_friction_coeff = v; }
+double MoVeEngine::get_friction_coeff() const { return m_friction_coeff; }
+
+void MoVeEngine::set_current_rpm(double v) { m_current_rpm = v; }
+double MoVeEngine::get_current_rpm() const { return m_current_rpm; }
 
 void MoVeEngine::_bind_methods() {
     // Methods
     ClassDB::bind_method(D_METHOD("engine_torque", "rpm"), &MoVeEngine::engine_torque);
+    ClassDB::bind_method(D_METHOD("update_rpm","delta"), &MoVeEngine::update_rpm);
 
     // Parameters
     ClassDB::bind_method(D_METHOD("set_bore", "value"), &MoVeEngine::set_bore);
@@ -175,4 +210,12 @@ void MoVeEngine::_bind_methods() {
     ADD_GROUP("Operation", "");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "redline_rpm", PROPERTY_HINT_RANGE, "1000,20000,1"), "set_redline_rpm", "get_redline_rpm");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "throttle", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_throttle", "get_throttle");
+
+    ClassDB::bind_method(D_METHOD("set_friction_coeff", "value"), &MoVeEngine::set_friction_coeff);
+    ClassDB::bind_method(D_METHOD("get_friction_coeff"), &MoVeEngine::get_friction_coeff);
+    ClassDB::bind_method(D_METHOD("set_current_rpm", "value"), &MoVeEngine::set_current_rpm);
+    ClassDB::bind_method(D_METHOD("get_current_rpm"), &MoVeEngine::get_current_rpm);
+
+    ADD_GROUP("Misc", "");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "friction_coeff", PROPERTY_HINT_RANGE, "0,20,0.1"), "set_friction_coeff", "get_friction_coeff");
 }

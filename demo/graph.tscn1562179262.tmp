@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://bxrgx616wgxd" path="res://control.gd" id="2_2637j"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_2637j"]
-buffer_length = 0.1
 
 [node name="Graph" type="Node2D"]
 script = ExtResource("1_41hjn")
@@ -28,9 +27,10 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("2_2637j")
-burble_gap = 0.5
+enable_burble = false
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Control"]
 stream = SubResource("AudioStreamGenerator_2637j")
 
+[connection signal="draw" from="." to="." method="_draw"]
 [connection signal="value_changed" from="Throttle" to="." method="_on_throttle_value_changed"]

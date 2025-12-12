@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://nf00j3ui3o12"]
+
+[ext_resource type="Script" uid="uid://bf78hb30akko3" path="res://graph.gd" id="1_41hjn"]
+
+[node name="Graph" type="Node2D"]
+script = ExtResource("1_41hjn")
+
+[node name="Line" type="Line2D" parent="."]
+position = Vector2(50, 50)
+points = PackedVector2Array(-2, 0)
+default_color = Color(1, 0, 0, 1)
+
+[node name="Throttle" type="HSlider" parent="."]
+offset_left = 338.0
+offset_top = 415.0
+offset_right = 567.0
+offset_bottom = 459.0
+
+[connection signal="draw" from="." to="." method="_on_draw"]
+[connection signal="value_changed" from="Throttle" to="." method="_on_throttle_value_changed"]
