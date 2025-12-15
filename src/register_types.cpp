@@ -9,6 +9,7 @@
 #include "components/wheel.hpp"
 #include "components/engine.hpp"
 #include "components/exhaust.hpp"
+#include "components/transmission.hpp"
 
 using namespace godot;
 
@@ -21,6 +22,7 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level)
 	GDREGISTER_CLASS(MoVeWheel);
 	GDREGISTER_CLASS(MoVeCar);
 	GDREGISTER_CLASS(MoVeExhaust);
+	GDREGISTER_CLASS(MoVeTransmission);
 }
 
 void uninitialize_gdextension_types(ModuleInitializationLevel p_level) {

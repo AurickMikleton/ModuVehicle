@@ -18,6 +18,7 @@ private:
 protected:
     static void _bind_methods();
 public:
+	void update();
 	void set_engine(Ref<MoVeEngine> value); Ref<MoVeEngine> get_engine() const;
 	void set_transmission(Ref<MoVeTransmission> value); Ref<MoVeTransmission> get_transmission() const;
 };

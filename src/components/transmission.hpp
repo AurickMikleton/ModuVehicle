@@ -11,7 +11,7 @@ using namespace godot;
 class MoVeTransmission : public Resource {
 private:
     GDCLASS(MoVeTransmission, Resource); // maybe, this class might be abstract
-    float gear_ratios[6]; // R N 1 2 3 4
+    Array gear_ratios; // R N 1 2 3 4
     int current_gear = 2;
     float final_drive = 3.7f;
     // torque converter
@@ -24,6 +24,11 @@ protected:
     static void _bind_methods();
 public:
     MoVeTransmission();
+    void shift_up();
+    void shift_down();
     float driveshaft_torque(float T_engine, float rpm, float throttle) const;
     float get_reflected_load(float rpm, float throttle) const;
+
+    int get_current_gear() const;
+    void set_gear_ratios(const Array &value); Array get_gear_ratios() const;
 };

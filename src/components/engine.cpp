@@ -5,7 +5,7 @@
 using namespace godot;
 
 double MoVeEngine::displacement_liters() const {
-    double displacement_m3 = (pi / 4.0) * m_bore * m_bore * m_stroke * m_cylinders;
+    double displacement_m3 = (Math_PI / 4.0) * m_bore * m_bore * m_stroke * m_cylinders;
     double displacement_l = displacement_m3 / 1000000.0;
     return displacement_l;
 }
@@ -54,18 +54,22 @@ void MoVeEngine::update_rpm(double delta) {
     // get torque values
     double torque = engine_torque(m_current_rpm);
     double torque_load = get_load_torque(m_current_rpm);
-    double torque_net = torque - torque_load;
+    double torque_net = torque - torque_load - m_reflected_load;
     // alpha = torque_net / I ; omega_new = omega + alpha*delta
-    double omega = m_current_rpm * (2.0f * pi / 60.0f); // "60.0" converts rads to rpm
+    double omega = m_current_rpm * (Math_TAU / 60.0f); // "60.0" converts rads to rpm
     double alpha = torque_net / m_inertia;
     omega += alpha * delta;
     
     if (omega < 0.0f) omega = 0.0f;
-    m_current_rpm = omega * (60.0 / (2.0 * pi)); // "60.0" converts rads to rpm
-    if (m_current_rpm < m_idle_rpm) m_current_rpm = m_idle_rpm;
+    m_current_rpm = omega * (60.0 / Math_TAU); // "60.0" converts rads to rpm
+    //if (m_current_rpm < m_idle_rpm) m_current_rpm = m_idle_rpm;
+
+    m_current_rpm = Math::clamp(m_current_rpm, m_idle_rpm, m_redline_rpm);
     
-    if (m_current_rpm > m_redline_rpm) m_current_rpm = m_redline_rpm;
+    //if (m_current_rpm > m_redline_rpm) m_current_rpm = m_redline_rpm;
 }
+
+void MoVeEngine::set_reflected_load(double v) { m_reflected_load = v; }
 
 void MoVeEngine::set_bore(double v) { m_bore = v; }
 double MoVeEngine::get_bore() const { return m_bore; }

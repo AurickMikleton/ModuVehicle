@@ -29,10 +29,10 @@ private:
     double m_spool_k = 600.0;         // arbitrary
 //const
     static constexpr double k_nm_per_liter = 120.0f; // newton meters per liter constant
-    static constexpr double pi = 3.14159265;
 //members
     double m_throttle = 1.0;
     double m_current_rpm = 900.0;
+    double m_reflected_load = 0.0;
 private:
     double displacement_liters() const;
     double get_load_torque(double in_rpm) const ;
@@ -41,6 +41,8 @@ protected:
 public:
     double engine_torque(double rpm);
     void update_rpm(double delta);
+
+    void set_reflected_load(double v);
 
     // Size
     void set_bore(double v); double get_bore() const;
