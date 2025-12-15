@@ -67,24 +67,6 @@ void MoVeEngine::update_rpm(double delta) {
     if (m_current_rpm > m_redline_rpm) m_current_rpm = m_redline_rpm;
 }
 
-MoVeEngine::MoVeEngine() {
-    m_bore = 99.5;                 // mm
-    m_stroke = 79.0;               // mm
-    m_cylinders = 4;               // number
-    m_peak_rpm_base = 4200.0;      // rpm
-    m_sigma_left = 1200.0;         // arbitrary
-    m_sigma_right = 900.0;         // arbitrary
-    m_wastegate_bar = 0.8;         // max boost (0.8bar ~ 11.6psi)
-    m_spool_rpm = 2500.0;          // rpm, turbo reaches efficiency island
-    m_spool_k = 600.0;             // steepness of spool curve
-    m_idle_rpm = 900.0;
-    m_friction_coeff = 8.0f; // Nm per 1000 rpm
-    m_redline_rpm = 7000.0;
-    m_current_rpm = 900.0;
-    // state
-    m_throttle = 1.0;
-}
-
 void MoVeEngine::set_bore(double v) { m_bore = v; }
 double MoVeEngine::get_bore() const { return m_bore; }
 

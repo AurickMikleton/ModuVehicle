@@ -13,34 +13,32 @@ private:
     GDCLASS(MoVeEngine, Resource);
 //properties
     //engine
-    double m_bore;          // mm
-    double m_stroke;        // mm
-    int m_cylinders;        // number
-    double m_peak_rpm_base;   // rpm
-    double m_sigma_left;      // arbitrary
-    double m_sigma_right;     // arbitrary
-    double m_idle_rpm;
-    double m_redline_rpm; // nvm
-    double m_friction_coeff; // Nm per 1000 rpm 
+    double m_bore = 99.5;           // mm
+    double m_stroke = 79.0;         // mm
+    int m_cylinders = 4;        // number
+    double m_peak_rpm_base = 4200.0;    // rpm
+    double m_sigma_left = 1200.0;      // arbitrary
+    double m_sigma_right = 900.0;     // arbitrary
+    double m_idle_rpm = 900.0;
+    double m_redline_rpm = 7000.0; // nvm
+    double m_friction_coeff = 8.0f; // Nm per 1000 rpm 
     double m_inertia = 0.15f;
     //turbo
-    double m_wastegate_bar;   // max boost in bar
-    double m_spool_rpm;        // rpm, turbo reaches efficiency island
-    double m_spool_k;         // arbitrary
+    double m_wastegate_bar = 0.8;   // max boost in bar
+    double m_spool_rpm = 2500.0;        // rpm, turbo reaches efficiency island
+    double m_spool_k = 600.0;         // arbitrary
 //const
     static constexpr double k_nm_per_liter = 120.0f; // newton meters per liter constant
     static constexpr double pi = 3.14159265;
 //members
-    double m_throttle;
-    double m_current_rpm;
+    double m_throttle = 1.0;
+    double m_current_rpm = 900.0;
 private:
     double displacement_liters() const;
     double get_load_torque(double in_rpm) const ;
 protected:
     static void _bind_methods();
 public:
-    MoVeEngine();
-
     double engine_torque(double rpm);
     void update_rpm(double delta);
 
