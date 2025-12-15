@@ -4,6 +4,8 @@
 #include "godot_cpp/classes/wrapped.hpp"
 #include "godot_cpp/variant/variant.hpp"
 
+#include "godot_cpp/variant/utility_functions.hpp"
+
 using namespace godot;
 
 class MoVeEngine : public Resource {
@@ -25,13 +27,6 @@ private:
     double m_wastegate_bar;   // max boost in bar
     double m_spool_rpm;        // rpm, turbo reaches efficiency island
     double m_spool_k;         // arbitrary
-    // rev limiter (bouncy / 2-step)
-    double rev_limit_rpm = 7000.0f;
-    double rev_soft_zone = 150.0f;
-    bool limiter_active = false;
-    double limiter_timer = 0.0f;
-    double limiter_cycle_period = 0.08f; // seconds
-    double limiter_cut_ratio = 0.5f; // fraction of cycle spent cutting
 //const
     static constexpr double k_nm_per_liter = 120.0f; // newton meters per liter constant
     static constexpr double pi = 3.14159265;

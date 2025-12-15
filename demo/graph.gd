@@ -8,12 +8,10 @@ const GRAPH_HEIGHT := 400.0
 const RPM_MIN := 900.0
 const RPM_MAX := 7000.0
 
-@onready var control: Control = $Control
-
 const NEW_MO_VE_ENGINE = preload("uid://valdgkwegmbq")
 
 var torque_func: Callable = NEW_MO_VE_ENGINE.engine_torque
-var current_rpm: float = 900.0   # ← set this externally
+var current_rpm: float = 900.0
 
 func _ready() -> void:
 	draw_graph()
@@ -21,10 +19,12 @@ func _ready() -> void:
 func _process(delta):
 	NEW_MO_VE_ENGINE.update_rpm(delta)
 	current_rpm = NEW_MO_VE_ENGINE.get_current_rpm()
-	control.set_rpm(current_rpm)
-	control.throttle = NEW_MO_VE_ENGINE.get_throttle()
-	#print(current_rpm)
+	
 	queue_redraw()
+	if Input.is_action_pressed("throttle"):
+		NEW_MO_VE_ENGINE.set_throttle(1)
+	else:
+		NEW_MO_VE_ENGINE.set_throttle(0)
 
 func draw_graph() -> void:
 	var points: Array[Vector2] = []
@@ -61,6 +61,3 @@ func get_max_torque() -> float:
 		var rpm : float = lerp(RPM_MIN, RPM_MAX, t)
 		max_val = max(max_val, torque_func.call(rpm))
 	return max_val
-
-func _on_throttle_value_changed(value: float) -> void:
-	NEW_MO_VE_ENGINE.set_throttle(value)

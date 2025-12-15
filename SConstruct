@@ -38,7 +38,16 @@ Run the following command to download godot-cpp:
 env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
 env.Append(CPPPATH=["src/"])
-sources = Glob("src/*.cpp")
+
+sources = []
+
+for root, dirs, files in os.walk("src"):
+    if "gen" in root.replace("\\", "/").split("/"):
+        continue
+
+    for file in files:
+        if file.endswith(".cpp"):
+            sources.append(os.path.join(root, file))
 
 if env["target"] in ["editor", "template_debug"]:
     try:
