@@ -64,7 +64,7 @@ void MoVeEngine::update_rpm(double delta) {
     m_current_rpm = omega * (60.0 / (2.0 * pi)); // "60.0" converts rads to rpm
     if (m_current_rpm < m_idle_rpm) m_current_rpm = m_idle_rpm;
     
-    if (m_current_rpm > m_redline_rpm * 1.05f) m_current_rpm = m_redline_rpm * 1.05f;
+    if (m_current_rpm > m_redline_rpm) m_current_rpm = m_redline_rpm;
 }
 
 MoVeEngine::MoVeEngine() {

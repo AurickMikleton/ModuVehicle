@@ -11,12 +11,15 @@ buffer_length = 0.1
 script = ExtResource("1_41hjn")
 
 [node name="Line" type="Line2D" parent="."]
-position = Vector2(50, 50)
+position = Vector2(150, 150)
 points = PackedVector2Array(-2, 0)
 default_color = Color(1, 0, 0, 1)
 
 [node name="MoVeExhaust" type="MoVeExhaust" parent="."]
 engine = ExtResource("2_a86xn")
+cylinders = 8
+idle_rpm = 900.0
+enable_burble = false
 process_mode = 3
 stream = SubResource("AudioStreamGenerator_a86xn")
 script = ExtResource("3_a86xn")

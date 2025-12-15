@@ -47,9 +47,12 @@ func _draw() -> void:
 	var t := (current_rpm - RPM_MIN) / (RPM_MAX - RPM_MIN)
 	var x := t * GRAPH_WIDTH
 	
+	var pos_x := line.position.x
+	var pos_y := line.position.y
+	
 	draw_line(
-		Vector2(x, 0),
-		Vector2(x, GRAPH_HEIGHT),
+		Vector2(x + pos_x, 0 + pos_y),
+		Vector2(x + pos_x, GRAPH_HEIGHT + pos_y),
 		Color.WHITE,
 		3.0
 	)
