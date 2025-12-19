@@ -7,6 +7,9 @@
 
 #include "components/engine.hpp"
 #include "components/transmission.hpp"
+#include "components/wheel.hpp"
+
+#include <vector>
 
 using namespace godot;
 
@@ -15,10 +18,16 @@ private:
     GDCLASS(MoVeCar, RigidBody3D);
 	Ref<MoVeEngine> m_engine;
 	Ref<MoVeTransmission> m_transmission;
+	TypedArray<NodePath> m_wheel_paths;
+	std::vector<MoVeWheel*> wheels;
 protected:
     static void _bind_methods();
 public:
 	void update();
+	void _ready() override;
+	void update_wheels();
+	void update_suspension();
 	void set_engine(Ref<MoVeEngine> value); Ref<MoVeEngine> get_engine() const;
 	void set_transmission(Ref<MoVeTransmission> value); Ref<MoVeTransmission> get_transmission() const;
+	void set_wheel_paths(const TypedArray<NodePath> &p_paths); TypedArray<NodePath> get_wheel_paths() const;
 };

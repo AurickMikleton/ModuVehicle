@@ -6,12 +6,14 @@
 using namespace godot;
 
 class MoVeWheel : public RayCast3D {
-private:
-    bool m_steering;
+public:
+    float m_spring_strength = 100.0f;
+    float m_spring_damping = 2.0f;
+    float m_resting_distnace = 0.5f;
     GDCLASS(MoVeWheel, RayCast3D);
 protected:
     static void _bind_methods();
 public:
     MoVeWheel() = default;
-    bool get_steering() const;
+    void update_suspension();
 };

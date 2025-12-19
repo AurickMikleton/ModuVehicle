@@ -1,13 +1,56 @@
-[gd_scene format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=8 format=3 uid="uid://dh0oj81pufivs"]
+
+[ext_resource type="MoVeEngine" uid="uid://valdgkwegmbq" path="res://new_mo_ve_engine.tres" id="1_2jas5"]
+[ext_resource type="Script" uid="uid://cdhpi1ulpmdub" path="res://mo_ve_car.gd" id="2_n51mc"]
+
+[sub_resource type="MoVeTransmission" id="MoVeTransmission_n51mc"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_n51mc"]
+size = Vector3(3, 0.5, 1.5)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2jas5"]
+points = PackedVector3Array(-1.5, -0.25, -0.75, -1.5, 0.25, -0.75, 1.5, -0.25, -0.75, -1.5, -0.25, 0.75, -1.5, 0.25, 0.75, 1.5, 0.25, -0.75, 1.5, -0.25, 0.75, 1.5, 0.25, 0.75)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2jas5"]
+size = Vector3(20, 0.5, 20)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_n51mc"]
+data = PackedVector3Array(-10, 0.25, 10, 10, 0.25, 10, -10, -0.25, 10, 10, 0.25, 10, 10, -0.25, 10, -10, -0.25, 10, 10, 0.25, -10, -10, 0.25, -10, 10, -0.25, -10, -10, 0.25, -10, -10, -0.25, -10, 10, -0.25, -10, 10, 0.25, 10, 10, 0.25, -10, 10, -0.25, 10, 10, 0.25, -10, 10, -0.25, -10, 10, -0.25, 10, -10, 0.25, -10, -10, 0.25, 10, -10, -0.25, -10, -10, 0.25, 10, -10, -0.25, 10, -10, -0.25, -10, 10, 0.25, 10, -10, 0.25, 10, 10, 0.25, -10, -10, 0.25, 10, -10, 0.25, -10, 10, 0.25, -10, -10, -0.25, 10, 10, -0.25, 10, -10, -0.25, -10, 10, -0.25, 10, 10, -0.25, -10, -10, -0.25, -10)
 
 [node name="Node3D" type="Node3D"]
 
 [node name="MoVeCar" type="MoVeCar" parent="."]
+engine = ExtResource("1_2jas5")
+transmission = SubResource("MoVeTransmission_n51mc")
+wheels = Array[NodePath]([NodePath("FrontLeft"), NodePath("FrontRight"), NodePath("RearLeft"), NodePath("RearRight")])
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1293252, 0)
+script = ExtResource("2_n51mc")
 
-[node name="MoVeWheel" type="MoVeWheel" parent="MoVeCar"]
+[node name="FrontLeft" type="MoVeWheel" parent="MoVeCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.25, 0.75)
 
-[node name="MoVeWheel2" type="MoVeWheel" parent="MoVeCar"]
+[node name="FrontRight" type="MoVeWheel" parent="MoVeCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.25, -0.75)
 
-[node name="MoVeWheel3" type="MoVeWheel" parent="MoVeCar"]
+[node name="RearLeft" type="MoVeWheel" parent="MoVeCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.25, 0.75)
 
-[node name="MoVeWheel4" type="MoVeWheel" parent="MoVeCar"]
+[node name="RearRight" type="MoVeWheel" parent="MoVeCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.25, -0.75)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MoVeCar"]
+mesh = SubResource("BoxMesh_n51mc")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="MoVeCar"]
+shape = SubResource("ConvexPolygonShape3D_2jas5")
+
+[node name="floor" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_2jas5")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="floor"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_n51mc")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8797443, 5.002275)
