@@ -28,10 +28,10 @@ void MoVeCar::update_wheels() {
 
 void MoVeCar::update_suspension() {
     for (auto &wheel : wheels) {
-        if (!wheel->is_colliding()) return;
+        if (!wheel->is_colliding()) continue;
 
         Vector3 target = wheel->get_target_position();
-        target.y = (-(wheel->m_resting_distnace + wheel->m_wheel_radius));
+        target.y = (-(wheel->m_resting_distnace + wheel->m_wheel_radius + 0.2));
         wheel->set_target_position(target);
 
         Vector3 contact = wheel->get_collision_point();
@@ -57,6 +57,19 @@ void MoVeCar::update_suspension() {
     }
 }
 
+void MoVeCar::update_acceleration() {
+    for (auto &wheel : wheels) {
+        if (!wheel->is_colliding() || !wheel->get_is_powered()) continue;
+
+        Vector3 forward_direction = -wheel->get_global_transform().get_basis().get_column(2);
+        Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
+        Vector3 contact = wheel_mesh->get_global_position();
+        Vector3 force_vector = forward_direction * 200; // 700 is accel, pull numbers from trans
+        Vector3 force_position = contact - get_global_position();
+
+        apply_force(force_vector, force_position);
+    }
+}
 void MoVeCar::set_engine(Ref<MoVeEngine> value) {m_engine = value;}
 Ref<MoVeEngine> MoVeCar::get_engine() const {return m_engine;}
 
@@ -73,6 +86,7 @@ void MoVeCar::_bind_methods() {
     ClassDB::bind_method(D_METHOD("update"), &MoVeCar::update);
     ClassDB::bind_method(D_METHOD("update_wheels"), &MoVeCar::update_wheels);
     ClassDB::bind_method(D_METHOD("update_suspension"), &MoVeCar::update_suspension);
+    ClassDB::bind_method(D_METHOD("update_acceleration"), &MoVeCar::update_acceleration);
 
 	ClassDB::bind_method(D_METHOD("set_engine", "value"), &MoVeCar::set_engine);
     ClassDB::bind_method(D_METHOD("get_engine"), &MoVeCar::get_engine);

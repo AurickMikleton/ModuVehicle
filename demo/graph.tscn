@@ -21,7 +21,7 @@ default_color = Color(1, 0, 0, 1)
 [node name="MoVeExhaust" type="MoVeExhaust" parent="."]
 engine = ExtResource("2_a86xn")
 idle_rpm = 900.0
-enable_burble = false
+burble_intensity = 3.0
 process_mode = 3
 stream = SubResource("AudioStreamGenerator_a86xn")
 script = ExtResource("3_a86xn")

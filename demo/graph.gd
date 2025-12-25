@@ -16,7 +16,7 @@ var current_rpm: float = 900.0
 func _ready() -> void:
 	draw_graph()
 
-func _process(delta):
+func _physics_process(delta):
 	NEW_MO_VE_ENGINE.update_rpm(delta)
 	current_rpm = NEW_MO_VE_ENGINE.get_current_rpm()
 	

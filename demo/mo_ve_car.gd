@@ -10,5 +10,6 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	update()
 	update_suspension()
+	update_acceleration()
 	if Input.is_action_just_pressed("shift_up"): transmission.shift_up()
 	if Input.is_action_just_pressed("shift_down"): transmission.shift_down()
