@@ -1,19 +1,30 @@
 #include "wheel.hpp"
 
-void MoVeWheel::update_suspension() {
-    if (!is_colliding()) return;
+void MoVeWheel::set_spring_strength(float v) { m_spring_strength = v; }
+float MoVeWheel::get_spring_strength() const { return m_spring_strength; }
 
-    Vector3 contact = get_collision_point();
-    Vector3 up_direction = get_global_transform().get_basis().get_column(1);
-    float spring_length = get_global_position().distance_to(contact);
-    float offset = m_resting_distnace - spring_length;
+void MoVeWheel::set_spring_damping(float v) { m_spring_damping = v; }
+float MoVeWheel::get_spring_damping() const { return m_spring_damping; }
 
-    float spring_force = m_spring_strength * offset;
-    Vector3 force_vector = up_direction * spring_force;
-    Vector3 force_position_offset = contact - get_global_position();
-    // apply_force(force_vector, force_position_offset);
-}
+void MoVeWheel::set_resting_distnace(float v) { m_resting_distnace = v; }
+float MoVeWheel::get_resting_distnace() const { return m_resting_distnace; }
+
+void MoVeWheel::set_wheel_radius(float v) { m_wheel_radius = v; }
+float MoVeWheel::get_wheel_radius() const { return m_wheel_radius; }
 
 void MoVeWheel::_bind_methods() {
-    godot::ClassDB::bind_method(D_METHOD("update_suspension"), &MoVeWheel::update_suspension);
+    ClassDB::bind_method(D_METHOD("set_spring_strength", "value"), &MoVeWheel::set_spring_strength);
+    ClassDB::bind_method(D_METHOD("get_spring_strength"), &MoVeWheel::get_spring_strength);
+    ClassDB::bind_method(D_METHOD("set_spring_damping", "value"), &MoVeWheel::set_spring_damping);
+    ClassDB::bind_method(D_METHOD("get_spring_damping"), &MoVeWheel::get_spring_damping);
+    ClassDB::bind_method(D_METHOD("set_resting_distnace", "value"), &MoVeWheel::set_resting_distnace);
+    ClassDB::bind_method(D_METHOD("get_resting_distnace"), &MoVeWheel::get_resting_distnace);
+    ClassDB::bind_method(D_METHOD("set_wheel_radius", "value"), &MoVeWheel::set_wheel_radius);
+    ClassDB::bind_method(D_METHOD("get_wheel_radius"), &MoVeWheel::get_wheel_radius);
+
+    ADD_GROUP("properties", "");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spring_strength"), "set_spring_strength", "get_spring_strength");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spring_damping"), "set_spring_damping", "get_spring_damping");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "resting_distnace"), "set_resting_distnace", "get_resting_distnace");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "wheel_radius"), "set_wheel_radius", "get_wheel_radius");
 }

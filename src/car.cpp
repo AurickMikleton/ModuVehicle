@@ -30,13 +30,28 @@ void MoVeCar::update_suspension() {
     for (auto &wheel : wheels) {
         if (!wheel->is_colliding()) return;
 
+        Vector3 target = wheel->get_target_position();
+        target.y = (-(wheel->m_resting_distnace + wheel->m_wheel_radius));
+        wheel->set_target_position(target);
+
         Vector3 contact = wheel->get_collision_point();
         Vector3 up_direction = wheel->get_global_transform().get_basis().get_column(1);
-        float spring_length = wheel->get_global_position().distance_to(contact);
+        float spring_length = wheel->get_global_position().distance_to(contact) - wheel->m_wheel_radius;
         float offset = wheel->m_resting_distnace - spring_length;
 
+        Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
+        Vector3 mesh_target = wheel_mesh->get_position();
+        mesh_target.y = - spring_length;
+        wheel_mesh->set_position(mesh_target);
+
         float spring_force = wheel->m_spring_strength * offset;
-        Vector3 force_vector = up_direction * spring_force;
+
+        Vector3 world_velocity = get_linear_velocity() + get_angular_velocity().cross(contact - get_global_position());
+        float relative_velocity = up_direction.dot(world_velocity);
+        float spring_damp_force = relative_velocity * wheel->m_spring_damping;
+
+
+        Vector3 force_vector = up_direction * (spring_force - spring_damp_force);
         Vector3 force_position_offset = contact - wheel->get_global_position();
         apply_force(force_vector, force_position_offset);
     }

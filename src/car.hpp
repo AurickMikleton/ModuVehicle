@@ -5,6 +5,8 @@
 #include "godot_cpp/variant/variant.hpp"
 #include "godot_cpp/classes/ref.hpp"
 
+#include "godot_cpp/classes/node3d.hpp"
+
 #include "components/engine.hpp"
 #include "components/transmission.hpp"
 #include "components/wheel.hpp"
