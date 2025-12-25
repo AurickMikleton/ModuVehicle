@@ -1,5 +1,53 @@
 #include "wheel.hpp"
 
+void MoVeWheel::integrate(float delta) {
+    float rolling_torque = 0.015f * m_normal_force * m_wheel_radius;
+
+    float max_tire_force = m_mu * m_normal_force;
+    m_long_force = Math::clamp(
+        m_angular_velocity * m_wheel_radius * 50.0f,
+        -max_tire_force,
+        max_tire_force
+    );
+
+    float tire_torque = m_long_force * m_wheel_radius;
+
+    float net_torque =
+        m_drive_torque
+        - tire_torque
+        - rolling_torque
+        - m_brake_torque;
+    
+    float alpha = net_torque / m_inertia;
+    m_angular_velocity += alpha * delta;
+
+    m_reaction_torque = tire_torque + rolling_torque;
+}
+
+void MoVeWheel::set_drive_torque(float t) {
+    m_drive_torque = m_is_powered ? t : 0.0f;
+}
+
+void MoVeWheel::set_brake_torque(float t) {
+    m_brake_torque = t;
+}
+
+void MoVeWheel::set_normal_force(float f) {
+    m_normal_force = Math::max(f, 0.0f);
+}
+
+float MoVeWheel::get_longitudinal_force() const {
+    return m_long_force;
+}
+
+float MoVeWheel::get_reaction_torque() const {
+    return m_reaction_torque;
+}
+
+float MoVeWheel::get_angular_velocity() const {
+    return m_angular_velocity;
+}
+
 void MoVeWheel::set_is_powered(bool v) { m_is_powered = v; }
 bool MoVeWheel::get_is_powered() const { return m_is_powered; }
 

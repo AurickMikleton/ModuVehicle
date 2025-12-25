@@ -12,12 +12,35 @@ public:
     float m_resting_distnace = 0.5f;
     float m_wheel_radius = 0.4f;
     bool m_is_powered = false;
+    // rotation
+    float m_angular_velocity = 0.0f; // rad/s
+    float m_inertia = 1.2f; // kg * m^2
+    // tire
+    float m_normal_force = 0.0f; // N
+    float m_mu = 1.2f; // friction coefficient
+    // inputs
+    float m_drive_torque = 0.0f; // Nm
+    float m_brake_torque = 0.0f; // Nm
+    // outputs
+    float m_reaction_torque = 0.0f;  // Nm
+    float m_long_force = 0.0f;       // N
+
+
     GDCLASS(MoVeWheel, RayCast3D);
 protected:
     static void _bind_methods();
 public:
-    MoVeWheel() = default;
-    void update_suspension();
+    float get_resistance_torque() const;
+    void integrate(float delta);
+
+    void set_drive_torque(float t);
+    void set_brake_torque(float t);
+
+    float get_longitudinal_force() const;
+    float get_reaction_torque() const;
+    float get_angular_velocity() const;
+
+    void set_normal_force(float f);
 
     void set_is_powered(bool v); bool get_is_powered() const;
     void set_spring_strength(float v); float get_spring_strength() const;
