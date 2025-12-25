@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=14 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="MoVeEngine" uid="uid://valdgkwegmbq" path="res://new_mo_ve_engine.tres" id="1_2jas5"]
 [ext_resource type="Script" uid="uid://cdhpi1ulpmdub" path="res://mo_ve_car.gd" id="2_n51mc"]
+[ext_resource type="Script" uid="uid://mom1805uyft0" path="res://mo_ve_exhaust.gd" id="3_8lvy3"]
 
 [sub_resource type="MoVeTransmission" id="MoVeTransmission_n51mc"]
 
@@ -15,6 +16,9 @@ size = Vector3(1.5, 0.5, 3)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_n51mc"]
 points = PackedVector3Array(0.75, 0.25, 1.5, 0.75, -0.25, 1.5, 0.75, 0.25, -1.5, -0.75, 0.25, 1.5, -0.75, -0.25, 1.5, 0.75, -0.25, -1.5, -0.75, 0.25, -1.5, -0.75, -0.25, -1.5)
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_8lvy3"]
+buffer_length = 0.1
 
 [sub_resource type="BoxMesh" id="BoxMesh_2jas5"]
 size = Vector3(20, 0.5, 20)
@@ -38,13 +42,13 @@ engine = ExtResource("1_2jas5")
 transmission = SubResource("MoVeTransmission_n51mc")
 wheels = Array[NodePath]([NodePath("RearLeft"), NodePath("RearRight"), NodePath("FrontLeft"), NodePath("FrontRight")])
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1293252, 0)
-mass = 50.0
+mass = 1500.0
 script = ExtResource("2_n51mc")
 
 [node name="RearLeft" type="MoVeWheel" parent="MoVeCar"]
 is_powered = true
-spring_strength = 5000.0
-spring_damping = 100.0
+spring_strength = 50000.0
+spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, 1)
 
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearLeft"]
@@ -53,8 +57,8 @@ mesh = SubResource("CylinderMesh_n51mc")
 
 [node name="RearRight" type="MoVeWheel" parent="MoVeCar"]
 is_powered = true
-spring_strength = 5000.0
-spring_damping = 100.0
+spring_strength = 50000.0
+spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, 1)
 
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearRight"]
@@ -62,8 +66,8 @@ transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -
 mesh = SubResource("CylinderMesh_n51mc")
 
 [node name="FrontLeft" type="MoVeWheel" parent="MoVeCar"]
-spring_strength = 5000.0
-spring_damping = 100.0
+spring_strength = 50000.0
+spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -1)
 
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontLeft"]
@@ -71,8 +75,8 @@ transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -
 mesh = SubResource("CylinderMesh_n51mc")
 
 [node name="FrontRight" type="MoVeWheel" parent="MoVeCar"]
-spring_strength = 5000.0
-spring_damping = 100.0
+spring_strength = 50000.0
+spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -1)
 
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontRight"]
@@ -84,6 +88,11 @@ mesh = SubResource("BoxMesh_n51mc")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MoVeCar"]
 shape = SubResource("ConvexPolygonShape3D_n51mc")
+
+[node name="MoVeExhaust" type="MoVeExhaust" parent="MoVeCar"]
+engine = ExtResource("1_2jas5")
+stream = SubResource("AudioStreamGenerator_8lvy3")
+script = ExtResource("3_8lvy3")
 
 [node name="floor" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_2jas5")

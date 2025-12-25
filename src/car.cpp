@@ -58,13 +58,23 @@ void MoVeCar::update_suspension() {
 }
 
 void MoVeCar::update_acceleration() {
+    int powered_wheels = 0;
+    for (auto &wheel : wheels) if (wheel->get_is_powered()) powered_wheels++;
+
+    float engine_rpm = m_engine->get_current_rpm();
+    float driveshaft_torque = m_transmission->driveshaft_torque(m_engine->engine_torque(engine_rpm), engine_rpm, m_engine->get_throttle());
+    float torque_per_wheel = driveshaft_torque / (float) powered_wheels;
+    
     for (auto &wheel : wheels) {
         if (!wheel->is_colliding() || !wheel->get_is_powered()) continue;
 
-        Vector3 forward_direction = -wheel->get_global_transform().get_basis().get_column(2);
+        Vector3 forward = -wheel->get_global_transform().get_basis().get_column(2);
+
+        float force_magnitude = torque_per_wheel / wheel->m_wheel_radius;
+
         Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
         Vector3 contact = wheel_mesh->get_global_position();
-        Vector3 force_vector = forward_direction * 200; // 700 is accel, pull numbers from trans
+        Vector3 force_vector = forward * force_magnitude;
         Vector3 force_position = contact - get_global_position();
 
         apply_force(force_vector, force_position);
