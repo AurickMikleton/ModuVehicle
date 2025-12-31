@@ -35,6 +35,7 @@ private:
     double m_reflected_load = 0.0;
     double m_idle_kp = 0.4;    // proportional gain
     double m_idle_max_torque = 40.0; // Nm
+    double m_drivetrain_torque = 0.0;
 private:
     double displacement_liters() const;
     double get_load_torque(double in_rpm) const ;
@@ -45,6 +46,10 @@ public:
     void update_rpm(double delta);
 
     void set_reflected_load(double v);
+
+    void set_drivetrain_torque(double t);
+    double get_drivetrain_torque() const;
+
 
     // Size
     void set_bore(double v); double get_bore() const;

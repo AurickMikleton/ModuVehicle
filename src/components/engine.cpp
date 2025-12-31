@@ -54,7 +54,7 @@ void MoVeEngine::update_rpm(double delta) {
     // get torque values
     double torque = engine_torque(m_current_rpm);
     double torque_load = get_load_torque(m_current_rpm);
-    double torque_net = torque - torque_load - m_reflected_load;
+    double torque_net = torque - torque_load - m_reflected_load - m_drivetrain_torque;
 
     if (m_throttle < 0.02) {
         double rpm_error = m_idle_rpm - m_current_rpm;
@@ -76,6 +76,10 @@ void MoVeEngine::update_rpm(double delta) {
     m_current_rpm = Math::min(m_current_rpm, m_redline_rpm); // no idle clamp
     //m_current_rpm = Math::clamp(m_current_rpm, m_idle_rpm, m_redline_rpm);
 }
+
+
+void MoVeEngine::set_drivetrain_torque(double t) { m_drivetrain_torque = t; }
+double MoVeEngine::get_drivetrain_torque() const { return m_drivetrain_torque; }
 
 void MoVeEngine::set_reflected_load(double v) { m_reflected_load = v; }
 
