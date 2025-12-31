@@ -14,6 +14,7 @@ public:
     bool m_is_powered = false;
     // rotation
     float m_angular_velocity = 0.0f; // rad/s
+    float m_ground_speed = 0.0f;
     float m_inertia = 1.2f; // kg * m^2
     // tire
     float m_normal_force = 0.0f; // N
@@ -36,9 +37,11 @@ public:
     void set_drive_torque(float t);
     void set_brake_torque(float t);
 
+    void set_ground_speed(float v_mps);   // forward speed at contact (m/s)
+    float get_angular_velocity() const;   // rad/s
+
     float get_longitudinal_force() const;
     float get_reaction_torque() const;
-    float get_angular_velocity() const;
 
     void set_normal_force(float f);
 

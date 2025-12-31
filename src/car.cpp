@@ -28,7 +28,10 @@ void MoVeCar::update_wheels() {
 
 void MoVeCar::update_suspension() {
     for (auto &wheel : wheels) {
-        if (!wheel->is_colliding()) continue;
+        if (!wheel->is_colliding()) {
+            wheel->set_normal_force(0.0f);
+            continue;
+        }
 
         Vector3 target = wheel->get_target_position();
         target.y = (-(wheel->m_resting_distnace + wheel->m_wheel_radius + 0.2));
@@ -37,65 +40,104 @@ void MoVeCar::update_suspension() {
         Vector3 contact = wheel->get_collision_point();
         Vector3 up_direction = wheel->get_global_transform().get_basis().get_column(1);
         float spring_length = wheel->get_global_position().distance_to(contact) - wheel->m_wheel_radius;
-        float offset = wheel->m_resting_distnace - spring_length;
+
+        // clamp physically valid spring length
+        spring_length = Math::clamp(spring_length, 0.0f, wheel->m_resting_distnace);
+
+        // compression only
+        float compression = wheel->m_resting_distnace - spring_length;
+        if (compression <= 0.0f) {
+            wheel->set_normal_force(0.0f);
+            continue;
+        }
 
         Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
         Vector3 mesh_target = wheel_mesh->get_position();
         mesh_target.y = - spring_length;
         wheel_mesh->set_position(mesh_target);
 
-        float spring_force = wheel->m_spring_strength * offset;
+        float spring_force = wheel->m_spring_strength * compression;
 
         Vector3 world_velocity = get_linear_velocity() + get_angular_velocity().cross(contact - get_global_position());
         float relative_velocity = up_direction.dot(world_velocity);
         float spring_damp_force = relative_velocity * wheel->m_spring_damping;
+        float normal_force = Math::max(0.0f, spring_force - spring_damp_force);
 
+        wheel->set_normal_force(normal_force);
 
         Vector3 force_vector = up_direction * (spring_force - spring_damp_force);
-        Vector3 force_position_offset = contact - wheel->get_global_position();
+        Vector3 force_position_offset = contact - get_global_position();
         apply_force(force_vector, force_position_offset);
     }
 }
 
-void MoVeCar::update_acceleration(float delta) {
-    int powered_wheels = 0;
-    for (auto &wheel : wheels) if (wheel->get_is_powered()) powered_wheels++;
+void MoVeCar::update_acceleration(float dt) {
+    int powered = 0;
+    for (auto &w : wheels) if (w->get_is_powered()) powered++;
+    if (powered == 0) return;
+
+    float gear = m_transmission->get_gear_ratio();
+    if (gear == 0.0f) return;
+
+    // avg powered wheel omega -> turbine rpm
+    float avg_omega = 0.0f;
+    for (auto &w : wheels) {
+        if (!w->get_is_powered()) continue;
+        avg_omega += w->get_angular_velocity();
+    }
+    avg_omega /= (float)powered;
+
+    float wheel_rpm = avg_omega * (60.0f / Math_TAU);
+    float turbine_rpm = Math::abs(wheel_rpm * gear);
 
     float engine_rpm = m_engine->get_current_rpm();
-    float driveshaft_torque = m_transmission->driveshaft_torque(m_engine->engine_torque(engine_rpm), engine_rpm, m_engine->get_throttle());
-    float torque_per_wheel = driveshaft_torque / (float) powered_wheels;
+    float throttle = m_engine->get_throttle();
 
-    for (auto &wheel : wheels) {
-        if (!wheel->get_is_powered()) continue;
-        wheel->set_drive_torque(torque_per_wheel);
+    float T_engine = (float)m_engine->engine_torque(engine_rpm);
+    float tc_mult = m_transmission->torque_converter_multiplier(engine_rpm, turbine_rpm, throttle);
+
+    float driveshaft_torque = T_engine * tc_mult * gear;
+    float torque_per_wheel = driveshaft_torque / (float)powered;
+
+    float total_wheel_load = 0.0f;
+
+    for (auto &w : wheels) {
+        if (!w->get_is_powered() || !w->is_colliding()) continue;
+
+        Vector3 forward = -w->get_global_transform().get_basis().get_column(2);
+        Vector3 contact = w->get_collision_point();
+        Vector3 r = contact - get_global_position();
+
+        // ground speed at contact along forward
+        Vector3 v_contact = get_linear_velocity() + get_angular_velocity().cross(r);
+        float ground_speed = forward.dot(v_contact);
+
+        w->set_ground_speed(ground_speed);
+        w->set_drive_torque(torque_per_wheel);
+
+        // If you don’t yet compute normal force, you MUST provide something nonzero,
+        // or you’ll get 0 grip.
+        // Start simple:
+        // w->set_normal_force( (get_mass() * 9.81f) / wheels.size() );
+
+        w->integrate(dt);
+
+        
+
+        Vector3 force = forward * w->get_longitudinal_force();
+        apply_force(force, r);
+
+        total_wheel_load += w->get_reaction_torque();
     }
 
-    for (auto &wheel : wheels) {
-        if (!wheel->get_is_powered()) continue;
-        wheel->integrate(delta);
-    }
-
-    for (auto &wheel : wheels) {
-        if (!wheel->get_is_powered()) continue;
-        Vector3 forward = -wheel->get_global_transform().get_basis().get_column(2);
-        Vector3 force = forward * wheel->get_longitudinal_force();
-
-        Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
-        Vector3 contact_point = wheel_mesh->get_global_position();
-
-        apply_force(force, contact_point);
-    }
-    
-    float total_load = 0.0f;
-    
-    for (auto &wheel : wheels) {
-        if (!wheel->get_is_powered()) continue;
-        total_load += wheel->get_reaction_torque();
-}
-
-    m_engine->set_reflected_load(
-        m_transmission->get_reflected_load(total_load, m_engine->get_throttle()) + total_load
+    float reflected = m_transmission->reflect_wheel_load_to_engine(
+        total_wheel_load, engine_rpm, turbine_rpm, throttle
     );
+
+    // add baseline driveline drag reflected to engine
+    reflected += m_transmission->get_reflected_load(engine_rpm, throttle);
+
+    m_engine->set_reflected_load(reflected);
 }
 
 void MoVeCar::set_engine(Ref<MoVeEngine> value) {m_engine = value;}

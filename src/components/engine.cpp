@@ -5,8 +5,8 @@
 using namespace godot;
 
 double MoVeEngine::displacement_liters() const {
-    double displacement_m3 = (Math_PI / 4.0) * m_bore * m_bore * m_stroke * m_cylinders;
-    double displacement_l = displacement_m3 / 1000000.0;
+    double displacement_mm3 = (Math_PI / 4.0) * m_bore * m_bore * m_stroke * m_cylinders;
+    double displacement_l = displacement_mm3 / 1e6;
     return displacement_l;
 }
 
@@ -45,7 +45,7 @@ double MoVeEngine::engine_torque(double rpm) {
     double p = 1.0 + 2.0 * (rpm / m_redline_rpm);
     double throttle_factor = a * m_throttle + (1.0 - a) * pow(m_throttle, p);
 
-    double torque_output = torque_turbo_full * m_throttle;
+    double torque_output = torque_turbo_full * throttle_factor;
 
     return torque_output; // Nm
 }
@@ -55,6 +55,16 @@ void MoVeEngine::update_rpm(double delta) {
     double torque = engine_torque(m_current_rpm);
     double torque_load = get_load_torque(m_current_rpm);
     double torque_net = torque - torque_load - m_reflected_load;
+
+    if (m_throttle < 0.02) {
+        double rpm_error = m_idle_rpm - m_current_rpm;
+        if (rpm_error > 0.0) {
+            double idle_torque =
+                Math::clamp(rpm_error * m_idle_kp, 0.0, m_idle_max_torque);
+            torque_net += idle_torque;
+        }
+    }
+
     // alpha = torque_net / I ; omega_new = omega + alpha*delta
     double omega = m_current_rpm * (Math_TAU / 60.0f); // "60.0" converts rads to rpm
     double alpha = torque_net / m_inertia;
@@ -62,11 +72,9 @@ void MoVeEngine::update_rpm(double delta) {
     
     if (omega < 0.0f) omega = 0.0f;
     m_current_rpm = omega * (60.0 / Math_TAU); // "60.0" converts rads to rpm
-    //if (m_current_rpm < m_idle_rpm) m_current_rpm = m_idle_rpm;
 
-    m_current_rpm = Math::clamp(m_current_rpm, m_idle_rpm, m_redline_rpm);
-    
-    //if (m_current_rpm > m_redline_rpm) m_current_rpm = m_redline_rpm;
+    m_current_rpm = Math::min(m_current_rpm, m_idle_rpm); // no idle clamp
+    //m_current_rpm = Math::clamp(m_current_rpm, m_idle_rpm, m_redline_rpm);
 }
 
 void MoVeEngine::set_reflected_load(double v) { m_reflected_load = v; }

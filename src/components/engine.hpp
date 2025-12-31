@@ -33,6 +33,8 @@ private:
     double m_throttle = 1.0;
     double m_current_rpm = 900.0;
     double m_reflected_load = 0.0;
+    double m_idle_kp = 0.4;    // proportional gain
+    double m_idle_max_torque = 40.0; // Nm
 private:
     double displacement_liters() const;
     double get_load_torque(double in_rpm) const ;
