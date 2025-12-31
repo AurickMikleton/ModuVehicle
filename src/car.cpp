@@ -127,7 +127,7 @@ void MoVeCar::update_acceleration(float dt) {
         Vector3 force = forward * w->get_longitudinal_force();
         apply_force(force, r);
 
-        total_wheel_load += w->get_reaction_torque();
+        total_wheel_load += Math::abs(w->get_reaction_torque());
     }
 
     float reflected = m_transmission->reflect_wheel_load_to_engine(

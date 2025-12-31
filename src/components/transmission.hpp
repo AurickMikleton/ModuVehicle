@@ -30,6 +30,7 @@ public:
     float get_reflected_load(float rpm, float throttle) const;
 
     float get_gear_ratio() const; // includes final drive, signed
+    float torque_converter_coupling(float engine_rpm, float turbine_rpm) const;
     float torque_converter_multiplier(float engine_rpm, float turbine_rpm, float throttle) const;
     float reflect_wheel_load_to_engine(float wheel_load_torque, float engine_rpm, float turbine_rpm, float throttle) const;
 

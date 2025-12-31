@@ -47,6 +47,13 @@ float MoVeTransmission::torque_converter_multiplier(float engine_rpm, float turb
     return mult;
 }
 
+float MoVeTransmission::torque_converter_coupling(float engine_rpm, float turbine_rpm) const {
+    // 0 when turbine stalled, 1 when nearly coupled
+    if (engine_rpm < 50.0f) return 0.0f;
+    float ratio = turbine_rpm / engine_rpm;
+    return Math::clamp(ratio, 0.0f, 1.0f);
+}
+
 float MoVeTransmission::reflect_wheel_load_to_engine(
     float wheel_load_torque,
     float engine_rpm,
@@ -57,7 +64,16 @@ float MoVeTransmission::reflect_wheel_load_to_engine(
     if (gear == 0.0f) return 0.0f;
 
     float tc_mult = torque_converter_multiplier(engine_rpm, turbine_rpm, throttle);
-    return wheel_load_torque / (Math::abs(gear) * tc_mult);
+    float coupling = torque_converter_coupling(engine_rpm, turbine_rpm);
+
+    float reflected = (Math::abs(wheel_load_torque) / (Math::abs(gear) * tc_mult)) * coupling;
+
+    // ERR_PRINT(std::to_string(reflected).c_str());
+    // cap reflected load during high slip
+    if (coupling < 0.3f)
+         reflected = Math::min(reflected, 150.0f); // tune
+
+    return Math::max(reflected, 0.0f);
 }
 
 void MoVeTransmission::shift_down() {

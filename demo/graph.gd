@@ -29,6 +29,7 @@ func _physics_process(delta):
 func draw_graph() -> void:
 	var points: Array[Vector2] = []
 	var max_torque := get_max_torque()
+	print(max_torque)
 	
 	for i in range(SAMPLE_COUNT):
 		var t := float(i) / (SAMPLE_COUNT - 1)

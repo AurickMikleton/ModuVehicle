@@ -5,13 +5,19 @@ void MoVeWheel::integrate(float delta) {
 
     float wheel_surface = m_angular_velocity * m_wheel_radius; // m/s
     float denom = Math::max(Math::abs(m_ground_speed), 1.0f);
+
     float slip = (wheel_surface - m_ground_speed) / denom;
     slip = Math::clamp(slip, -3.0f, 3.0f);
 
     float stiffness = 8000.0f; // N per slip (tune)
     float desired_force = slip * stiffness;
 
+    float speed = Math::abs(m_ground_speed);
     float max_force = m_mu * m_normal_force;
+
+    float low_speed_blend = Math::clamp(speed / 2.0f, 0.0f, 1.0f); // 0..1 over 0-2 m/s
+    max_force *= (0.2f + 0.8f * low_speed_blend); // 20% at standstill -> 100% by 2 m/s
+
     m_long_force = Math::clamp(desired_force, -max_force, max_force);
 
     float tire_torque = m_long_force * m_wheel_radius;
