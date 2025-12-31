@@ -73,7 +73,7 @@ void MoVeEngine::update_rpm(double delta) {
     if (omega < 0.0f) omega = 0.0f;
     m_current_rpm = omega * (60.0 / Math_TAU); // "60.0" converts rads to rpm
 
-    m_current_rpm = Math::min(m_current_rpm, m_idle_rpm); // no idle clamp
+    m_current_rpm = Math::min(m_current_rpm, m_redline_rpm); // no idle clamp
     //m_current_rpm = Math::clamp(m_current_rpm, m_idle_rpm, m_redline_rpm);
 }
 
