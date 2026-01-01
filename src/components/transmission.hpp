@@ -19,6 +19,11 @@ private:
     float tc_max_mult = 2.2f;
     float tc_lockup_rpm = 4200.0f;
 
+    float couple_k = 20.0f;     // Nm per (rad/s) slip
+    float couple_max = 300.0f;  // Nm clamp
+    float lock_slip_rads = 2.0f; // lock when slip small (rad/s)
+    float lock_min_rpm = 1200.0f;
+
     float driveline_load = 60.0f; // Nm base resistance
 protected:
     static void _bind_methods();
@@ -28,6 +33,9 @@ public:
     void shift_down();
     float driveshaft_torque(float T_engine, float rpm, float throttle) const;
     float get_reflected_load(float rpm, float throttle) const;
+
+    bool should_lock(float engine_rpm, float slip_omega, float throttle) const;
+    float coupling_torque(float slip_omega) const;
 
     float get_gear_ratio() const; // includes final drive, signed
     float torque_converter_coupling(float engine_rpm, float turbine_rpm) const;

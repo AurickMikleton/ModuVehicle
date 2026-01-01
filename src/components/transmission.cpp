@@ -29,6 +29,17 @@ float MoVeTransmission::get_gear_ratio() const {
     return gear * final_drive;
 }
 
+bool MoVeTransmission::should_lock(float engine_rpm, float slip_omega, float throttle) const {
+    if (engine_rpm < lock_min_rpm) return false;
+    if (throttle > 0.3f) return false; // only lock at light throttle
+    return Math::abs(slip_omega) < lock_slip_rads;
+}
+
+float MoVeTransmission::coupling_torque(float slip_omega) const {
+    float T = couple_k * slip_omega;
+    return Math::clamp(T, -couple_max, couple_max);
+}
+
 float MoVeTransmission::torque_converter_multiplier(float engine_rpm, float turbine_rpm, float throttle) const {
     // slip based on speed difference
     float slip = 0.0f;

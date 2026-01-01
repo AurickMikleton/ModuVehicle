@@ -71,71 +71,74 @@ void MoVeCar::update_suspension() {
     }
 }
 
-void MoVeCar::update_acceleration(float dt) {
+void MoVeCar::update_acceleration(float delta) {
     int powered = 0;
-    for (auto &w : wheels) if (w->get_is_powered()) powered++;
-    if (powered == 0) return;
+    float avg_omega = 0.0f; // rad/s
 
-    float gear = m_transmission->get_gear_ratio();
-    if (gear == 0.0f) return;
-
-    // avg powered wheel omega -> turbine rpm
-    float avg_omega = 0.0f;
     for (auto &w : wheels) {
         if (!w->get_is_powered()) continue;
+        powered++;
         avg_omega += w->get_angular_velocity();
     }
+    if (powered == 0) return;
+
     avg_omega /= (float)powered;
 
-    float wheel_rpm = avg_omega * (60.0f / Math_TAU);
-    float turbine_rpm = Math::abs(wheel_rpm * gear);
+    float gear = m_transmission->get_gear_ratio();
+    if (gear == 0.0f) {
+        m_engine->set_reflected_load(0.0f);
+        return;
+    }
 
-    float engine_rpm = m_engine->get_current_rpm();
-    float throttle = m_engine->get_throttle();
+    float target_rpm = Math::abs(avg_omega * gear) * (60.0f / Math_TAU);
 
-    float T_engine = (float)m_engine->engine_torque(engine_rpm);
-    float tc_mult = m_transmission->torque_converter_multiplier(engine_rpm, turbine_rpm, throttle);
+    float rpm = (float)m_engine->get_current_rpm();
+    float lock_strength = 12.0f;                  // tune 6..20
+    float blend = 1.0f - Math::exp(-lock_strength * delta);
 
-    float driveshaft_torque = T_engine * tc_mult * gear;
+    float new_rpm = Math::lerp(rpm, target_rpm, blend);
+    // If you have idle control, you can still clamp to >= 0 here safely
+    m_engine->set_current_rpm(new_rpm);
+
+    // --- Engine torque (Nm) at the now-locked RPM
+    float throttle = (float)m_engine->get_throttle();
+    float T_engine = (float)m_engine->engine_torque(new_rpm);
+
+    // Driveshaft torque through gearing (Nm at wheels combined)
+    float driveshaft_torque = T_engine * gear;
     float torque_per_wheel = driveshaft_torque / (float)powered;
 
     float total_wheel_load = 0.0f;
 
     for (auto &w : wheels) {
-        if (!w->get_is_powered() || !w->is_colliding()) continue;
+        if (!w->get_is_powered() || !w->is_colliding()) {
+            if (w->get_is_powered()) w->set_normal_force(0.0f);
+            continue;
+        }
 
         Vector3 forward = -w->get_global_transform().get_basis().get_column(2);
         Vector3 contact = w->get_collision_point();
-        Vector3 r = contact - get_global_position();
+        Vector3 offset = contact - get_global_position();
 
-        // ground speed at contact along forward
-        Vector3 v_contact = get_linear_velocity() + get_angular_velocity().cross(r);
-        float ground_speed = forward.dot(v_contact);
+        Vector3 contact_velocity = get_linear_velocity() + get_angular_velocity().cross(offset);
+        float ground_speed = forward.dot(contact_velocity);
 
         w->set_ground_speed(ground_speed);
         w->set_drive_torque(torque_per_wheel);
 
-        // If you don’t yet compute normal force, you MUST provide something nonzero,
-        // or you’ll get 0 grip.
-        // Start simple:
-        // w->set_normal_force( (get_mass() * 9.81f) / wheels.size() );
-
-        w->integrate(dt);
-
-        
+        w->integrate(delta);
 
         Vector3 force = forward * w->get_longitudinal_force();
-        apply_force(force, r);
+        apply_force(force, offset);
 
         total_wheel_load += Math::abs(w->get_reaction_torque());
     }
 
-    float reflected = m_transmission->reflect_wheel_load_to_engine(
-        total_wheel_load, engine_rpm, turbine_rpm, throttle
-    );
-
-    // add baseline driveline drag reflected to engine
-    reflected += m_transmission->get_reflected_load(engine_rpm, throttle);
+    float reflected = 0.0f;
+    float gear_abs = Math::abs(gear);
+    if (gear_abs > 0.001f) {
+        reflected = total_wheel_load / gear_abs;
+    }
 
     m_engine->set_reflected_load(reflected);
 }

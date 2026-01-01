@@ -57,6 +57,10 @@ void MoVeEngine::update_rpm(double delta) {
     double torque_net = torque - torque_load - m_reflected_load - m_drivetrain_torque;
 
     if (m_throttle < 0.02) {
+        torque_net -= 20.0 + 0.02 * m_current_rpm; // tune
+    }
+
+    if (m_throttle < 0.02) {
         double rpm_error = m_idle_rpm - m_current_rpm;
         if (rpm_error > 0.0) {
             double idle_torque =
