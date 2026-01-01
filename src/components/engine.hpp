@@ -47,10 +47,6 @@ public:
 
     void set_reflected_load(double v);
 
-    void set_drivetrain_torque(double t);
-    double get_drivetrain_torque() const;
-
-
     // Size
     void set_bore(double v); double get_bore() const;
     void set_stroke(double v); double get_stroke() const;

@@ -7,8 +7,7 @@ void MoVeCar::_ready() {
 }
 
 void MoVeCar::update() {
-    float load = m_transmission->get_reflected_load(m_engine->get_current_rpm(), m_engine->get_throttle());
-    m_engine->set_reflected_load(load);
+    //pass
 }
 
 void MoVeCar::update_wheels() {
