@@ -37,7 +37,7 @@ public:
     void set_drive_torque(float t);
     void set_brake_torque(float t);
 
-    void set_ground_speed(float v_mps);   // forward speed at contact (m/s)
+    void set_ground_speed(float v_mps); float get_ground_speed() const; // forward speed at contact (m/s)
     float get_angular_velocity() const;   // rad/s
 
     float get_longitudinal_force() const;

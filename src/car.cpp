@@ -7,7 +7,7 @@ void MoVeCar::_ready() {
 }
 
 void MoVeCar::update() {
-    //pass
+    //TODO orchestrate other update functions; less reliance on GDScript
 }
 
 void MoVeCar::update_wheels() {
@@ -25,7 +25,7 @@ void MoVeCar::update_wheels() {
     }
 }
 
-void MoVeCar::update_suspension() {
+void MoVeCar::update_suspension(float delta) {
     for (auto &wheel : wheels) {
         if (!wheel->is_colliding()) {
             wheel->set_normal_force(0.0f);
@@ -84,7 +84,6 @@ void MoVeCar::update_acceleration(float delta) {
     // Gather powered wheel omega + contact speed
     for (auto &w : wheels) {
         if (!w->get_is_powered() || !w->is_colliding()) continue;
-
         powered++;
 
         avg_omega += w->get_angular_velocity();
@@ -145,8 +144,10 @@ void MoVeCar::update_acceleration(float delta) {
 
     float total_wheel_load = 0.0f;
 
-    // Apply torque to wheels and apply tire forces
     for (auto &w : wheels) {
+        // rotate wheels
+        Node3D *wheel_mesh = w->get_node<Node3D>("wheel");
+        wheel_mesh->rotate_x((-avg_speed * delta) / w->get_wheel_radius());
         if (!w->get_is_powered() || !w->is_colliding()) continue;
 
         Vector3 forward = -w->get_global_transform().get_basis().get_column(2);
@@ -157,7 +158,6 @@ void MoVeCar::update_acceleration(float delta) {
         float ground_speed = forward.dot(v_contact);
         w->set_ground_speed(ground_speed);
 
-        // Also scale delivered torque by coupling at low speed to avoid "jump"
         w->set_drive_torque(torque_per_wheel * couple);
         w->integrate(delta);
         apply_force(forward * w->get_longitudinal_force(), r);
@@ -165,12 +165,11 @@ void MoVeCar::update_acceleration(float delta) {
         total_wheel_load += Math::abs(w->get_reaction_torque());
     }
 
-    // Reflect load back to engine (resistive)
+    // Reflect load back to engine
     float reflected = 0.0f;
     float gear_abs = Math::abs(gear);
     if (gear_abs > 0.001f) reflected = total_wheel_load / gear_abs;
 
-    // IMPORTANT: scale reflected load by coupling too, otherwise you can bog at launch
     reflected *= couple;
 
     m_engine->set_reflected_load(reflected);

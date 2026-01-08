@@ -9,7 +9,7 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta: float) -> void:
 	update()
-	update_suspension()
+	update_suspension(delta)
 	update_acceleration(delta)
 	if Input.is_action_just_pressed("shift_up"): transmission.shift_up()
 	if Input.is_action_just_pressed("shift_down"): transmission.shift_down()
