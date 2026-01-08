@@ -175,6 +175,37 @@ void MoVeCar::update_acceleration(float delta) {
     m_engine->set_reflected_load(reflected);
 }
 
+void MoVeCar::update_traction(float delta) {
+    for (auto &wheel : wheels) {
+        if (!wheel->is_colliding()) { continue; }
+        Vector3 side_direction = wheel->get_global_transform().get_basis().get_column(0).normalized();
+
+        Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
+
+        Vector3 position = wheel_mesh->get_global_position(); // World-space position of the wheel mesh
+        Vector3 offset = position - get_global_position(); // Vector from COM → wheel point
+
+        // Point velocity at wheel mesh
+        Vector3 tire_velocity =
+            get_linear_velocity() +
+            get_angular_velocity().cross(offset);
+        
+        float steering_x_velocity = side_direction.dot(tire_velocity);
+
+        float x_traction = 1.0f;
+        float gravity = (float)ProjectSettings::get_singleton()
+                    ->get_setting("physics/3d/default_gravity");
+        Vector3 x_force =
+            -side_direction *
+            steering_x_velocity *
+            x_traction *
+            ((get_mass() * gravity) / (float)wheels.size());
+        
+        Vector3 force_position = wheel_mesh->get_global_position() - get_global_position();
+        apply_force(x_force, force_position);
+    }
+}
+
 void MoVeCar::set_engine(Ref<MoVeEngine> value) {m_engine = value;}
 Ref<MoVeEngine> MoVeCar::get_engine() const {return m_engine;}
 
@@ -192,6 +223,7 @@ void MoVeCar::_bind_methods() {
     ClassDB::bind_method(D_METHOD("update_wheels"), &MoVeCar::update_wheels);
     ClassDB::bind_method(D_METHOD("update_suspension"), &MoVeCar::update_suspension);
     ClassDB::bind_method(D_METHOD("update_acceleration"), &MoVeCar::update_acceleration);
+    ClassDB::bind_method(D_METHOD("update_traction"), &MoVeCar::update_traction);
 
 	ClassDB::bind_method(D_METHOD("set_engine", "value"), &MoVeCar::set_engine);
     ClassDB::bind_method(D_METHOD("get_engine"), &MoVeCar::get_engine);
