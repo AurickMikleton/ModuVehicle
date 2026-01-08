@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=20 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="MoVeEngine" uid="uid://valdgkwegmbq" path="res://new_mo_ve_engine.tres" id="1_2jas5"]
 [ext_resource type="Script" uid="uid://cdhpi1ulpmdub" path="res://mo_ve_car.gd" id="2_n51mc"]
@@ -6,11 +6,25 @@
 [ext_resource type="Texture2D" uid="uid://dbx66sovxd1" path="res://icon.svg" id="4_wcwec"]
 
 [sub_resource type="MoVeTransmission" id="MoVeTransmission_n51mc"]
+gear_ratios = Array[float]([-3.636, 0.0, 3.166, 1.8820000000000001, 1.296, 0.972])
+final_drive = 3.9
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_n51mc"]
 top_radius = 0.4
 bottom_radius = 0.4
 height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rujmf"]
+albedo_texture = ExtResource("4_wcwec")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wcwec"]
+albedo_texture = ExtResource("4_wcwec")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kkclv"]
+albedo_texture = ExtResource("4_wcwec")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ugfer"]
+albedo_texture = ExtResource("4_wcwec")
 
 [sub_resource type="BoxMesh" id="BoxMesh_n51mc"]
 size = Vector3(1.5, 0.5, 3)
@@ -61,6 +75,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, 1)
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearLeft"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
+surface_material_override/0 = SubResource("StandardMaterial3D_rujmf")
 
 [node name="RearRight" type="MoVeWheel" parent="MoVeCar"]
 is_powered = true
@@ -71,6 +86,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, 1)
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearRight"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
+surface_material_override/0 = SubResource("StandardMaterial3D_wcwec")
 
 [node name="FrontLeft" type="MoVeWheel" parent="MoVeCar"]
 spring_strength = 50000.0
@@ -80,6 +96,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -1)
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontLeft"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
+surface_material_override/0 = SubResource("StandardMaterial3D_kkclv")
 
 [node name="FrontRight" type="MoVeWheel" parent="MoVeCar"]
 spring_strength = 50000.0
@@ -89,6 +106,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -1)
 [node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontRight"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
+surface_material_override/0 = SubResource("StandardMaterial3D_ugfer")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="MoVeCar"]
 mesh = SubResource("BoxMesh_n51mc")

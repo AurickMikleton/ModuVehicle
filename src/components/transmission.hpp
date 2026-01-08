@@ -33,4 +33,5 @@ public:
     float get_gear_ratio() const; // includes final drive, signed
     int get_current_gear() const;
     void set_gear_ratios(const TypedArray<float> &value); TypedArray<float> get_gear_ratios() const;
+    void set_final_drive(float value); float get_final_drive() const;
 };

@@ -27,6 +27,12 @@ void MoVeTransmission::shift_up() {
 
 int MoVeTransmission::get_current_gear() const { return m_current_gear; }
 
+void MoVeTransmission::set_gear_ratios(const TypedArray<float> &value) { m_gear_ratios = value; }
+TypedArray<float> MoVeTransmission::get_gear_ratios() const { return m_gear_ratios; }
+
+void MoVeTransmission::set_final_drive(float value) { m_final_drive = value; }
+float MoVeTransmission::get_final_drive() const { return m_final_drive; }
+
 MoVeTransmission::MoVeTransmission() {
     m_gear_ratios.clear();
     m_gear_ratios.resize(6);
@@ -38,8 +44,6 @@ MoVeTransmission::MoVeTransmission() {
     m_gear_ratios[4] =  1.4f; // 3rd
     m_gear_ratios[5] =  1.0f; // 4th
 }
-void MoVeTransmission::set_gear_ratios(const TypedArray<float> &value) { m_gear_ratios = value; }
-TypedArray<float> MoVeTransmission::get_gear_ratios() const { return m_gear_ratios; }
 
 void MoVeTransmission::_bind_methods() {
     ClassDB::bind_method(D_METHOD("shift_up"), &MoVeTransmission::shift_up);
@@ -50,6 +54,11 @@ void MoVeTransmission::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_gear_ratios", "value"), &MoVeTransmission::set_gear_ratios);
     ClassDB::bind_method(D_METHOD("get_gear_ratios"), &MoVeTransmission::get_gear_ratios);
 
+    ClassDB::bind_method(D_METHOD("set_final_drive", "value"), &MoVeTransmission::set_final_drive);
+    ClassDB::bind_method(D_METHOD("get_final_drive"), &MoVeTransmission::get_final_drive);
+
     ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "gear_ratios", PROPERTY_HINT_ARRAY_TYPE, "float"),
              "set_gear_ratios", "get_gear_ratios");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "final_drive"),
+             "set_final_drive", "get_final_drive");
 }

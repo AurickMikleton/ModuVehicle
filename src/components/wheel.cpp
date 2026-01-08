@@ -30,6 +30,8 @@ void MoVeWheel::integrate(float delta) {
 }
 
 void MoVeWheel::set_ground_speed(float v_mps) { m_ground_speed = v_mps; }
+float MoVeWheel::get_ground_speed() const { return m_ground_speed; }
+
 float MoVeWheel::get_angular_velocity() const { return m_angular_velocity; }
 
 void MoVeWheel::set_drive_torque(float t) {
