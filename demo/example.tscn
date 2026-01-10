@@ -1,9 +1,10 @@
-[gd_scene load_steps=20 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=22 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="MoVeEngine" uid="uid://valdgkwegmbq" path="res://new_mo_ve_engine.tres" id="1_2jas5"]
 [ext_resource type="Script" uid="uid://cdhpi1ulpmdub" path="res://mo_ve_car.gd" id="2_n51mc"]
 [ext_resource type="Script" uid="uid://mom1805uyft0" path="res://mo_ve_exhaust.gd" id="3_8lvy3"]
 [ext_resource type="Texture2D" uid="uid://dbx66sovxd1" path="res://icon.svg" id="4_wcwec"]
+[ext_resource type="Script" uid="uid://cssaph27qyrwu" path="res://camera_3d.gd" id="5_ei00m"]
 
 [sub_resource type="MoVeTransmission" id="MoVeTransmission_n51mc"]
 gear_ratios = Array[float]([-3.636, 0.0, 3.166, 1.8820000000000001, 1.296, 0.972])
@@ -28,6 +29,9 @@ albedo_texture = ExtResource("4_wcwec")
 
 [sub_resource type="BoxMesh" id="BoxMesh_n51mc"]
 size = Vector3(1.5, 0.5, 3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ei00m"]
+size = Vector3(1.5, 0.5, 1.69)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_n51mc"]
 points = PackedVector3Array(0.75, 0.25, 1.5, 0.75, -0.25, 1.5, 0.75, 0.25, -1.5, -0.75, 0.25, 1.5, -0.75, -0.25, 1.5, 0.75, -0.25, -1.5, -0.75, 0.25, -1.5, -0.75, -0.25, -1.5)
@@ -111,6 +115,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ugfer")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="MoVeCar"]
 mesh = SubResource("BoxMesh_n51mc")
 
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MoVeCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3996594, 0.31700706)
+mesh = SubResource("BoxMesh_ei00m")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MoVeCar"]
 shape = SubResource("ConvexPolygonShape3D_n51mc")
 
@@ -118,6 +126,9 @@ shape = SubResource("ConvexPolygonShape3D_n51mc")
 engine = ExtResource("1_2jas5")
 stream = SubResource("AudioStreamGenerator_8lvy3")
 script = ExtResource("3_8lvy3")
+
+[node name="chase point" type="Node3D" parent="MoVeCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1692832, 6.7296333)
 
 [node name="floor" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_2jas5")
@@ -130,6 +141,9 @@ shape = SubResource("ConcavePolygonShape3D_wcwec")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20.908703, 6.763218, 0)
+script = ExtResource("5_ei00m")
+target_path = NodePath("../MoVeCar")
+distance = -6.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_wcwec")
