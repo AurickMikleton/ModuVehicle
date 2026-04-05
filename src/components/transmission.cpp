@@ -8,7 +8,7 @@ float MoVeTransmission::get_gear_ratio() const {
 
 bool MoVeTransmission::should_lock(float engine_rpm, float slip_omega, float throttle) const {
     if (engine_rpm < m_lock_min_rpm) return false;
-    if (throttle > 0.3f) return false; // only lock at light throttle
+    //if (throttle > 0.3f) return false; // only lock at light throttle
     return Math::abs(slip_omega) < m_lock_slip_rads;
 }
 

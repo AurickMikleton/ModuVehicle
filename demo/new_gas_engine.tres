@@ -1,0 +1,4 @@
+[gd_resource type="GasEngine" format=3 uid="uid://d2020b0cq84qh"]
+
+[resource]
+sigma_left = 3000.0

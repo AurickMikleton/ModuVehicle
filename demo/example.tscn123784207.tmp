@@ -1,11 +1,17 @@
 [gd_scene load_steps=23 format=3 uid="uid://dh0oj81pufivs"]
 
-[ext_resource type="GasEngine" uid="uid://d2020b0cq84qh" path="res://new_gas_engine.tres" id="1_ugfer"]
 [ext_resource type="Script" uid="uid://cdhpi1ulpmdub" path="res://mo_ve_car.gd" id="2_n51mc"]
 [ext_resource type="Script" uid="uid://mom1805uyft0" path="res://mo_ve_exhaust.gd" id="3_8lvy3"]
 [ext_resource type="Texture2D" uid="uid://dbx66sovxd1" path="res://icon.svg" id="4_wcwec"]
 [ext_resource type="Script" uid="uid://cssaph27qyrwu" path="res://camera_3d.gd" id="5_ei00m"]
 [ext_resource type="PackedScene" uid="uid://nf00j3ui3o12" path="res://graph.tscn" id="6_ugfer"]
+
+[sub_resource type="MoVeEngine" id="MoVeEngine_ei00m"]
+resource_local_to_scene = false
+resource_name = ""
+peak_rpm_base = 2300.0
+sigma_left = 1500.0
+sigma_right = 2500.0
 
 [sub_resource type="MoVeTransmission" id="MoVeTransmission_n51mc"]
 gear_ratios = Array[float]([-3.636, 0.0, 3.166, 1.882, 1.296, 0.972])
@@ -62,7 +68,7 @@ sky = SubResource("Sky_8lvy3")
 [node name="Node3D" type="Node3D"]
 
 [node name="MoVeCar" type="MoVeCar" parent="."]
-engine = ExtResource("1_ugfer")
+engine = SubResource("MoVeEngine_ei00m")
 transmission = SubResource("MoVeTransmission_n51mc")
 wheels = Array[NodePath]([NodePath("RearLeft"), NodePath("RearRight"), NodePath("FrontLeft"), NodePath("FrontRight")])
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.129, 21.32)
@@ -124,7 +130,7 @@ mesh = SubResource("BoxMesh_ei00m")
 shape = SubResource("ConvexPolygonShape3D_n51mc")
 
 [node name="MoVeExhaust" type="MoVeExhaust" parent="MoVeCar"]
-engine = ExtResource("1_ugfer")
+engine = SubResource("MoVeEngine_ei00m")
 max_rpm = 5000.0
 stream = SubResource("AudioStreamGenerator_8lvy3")
 script = ExtResource("3_8lvy3")
