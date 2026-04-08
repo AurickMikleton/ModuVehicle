@@ -1,32 +1,32 @@
 #include "wheel.hpp"
 
 void MoVeWheel::integrate(float delta) {
-    float rolling_torque = 0.015f * m_normal_force * m_wheel_radius;
+	float rolling_torque = 0.015f * m_normal_force * m_wheel_radius;
 
-    float wheel_surface = m_angular_velocity * m_wheel_radius; // m/s
-    float denom = Math::max(Math::abs(m_ground_speed), 1.0f);
+	float wheel_surface = m_angular_velocity * m_wheel_radius; // m/s
+	float denom = Math::max(Math::abs(m_ground_speed), 0.25f);
 
-    float slip = (wheel_surface - m_ground_speed) / denom;
-    slip = Math::clamp(slip, -3.0f, 3.0f);
+	float slip = (wheel_surface - m_ground_speed) / denom;
+	slip = Math::clamp(slip, -3.0f, 3.0f);
 
-    float stiffness = 8000.0f; // N per slip (tune)
-    float desired_force = slip * stiffness;
+	float stiffness = 4000.0f; // N per slip (tune)
+	float desired_force = slip * stiffness;
 
-    float speed = Math::abs(m_ground_speed);
-    float max_force = m_mu * m_normal_force;
+	float speed = Math::abs(m_ground_speed);
+	float max_force = m_mu * m_normal_force;
+	m_long_force = Math::clamp(desired_force, -max_force, max_force);
 
-    float low_speed_blend = Math::clamp(speed / 2.0f, 0.0f, 1.0f); // 0..1 over 0-2 m/s
-    max_force *= (0.2f + 0.8f * low_speed_blend); // 20% at standstill -> 100% by 2 m/s
+	float tire_torque = m_long_force * m_wheel_radius;
 
-    m_long_force = Math::clamp(desired_force, -max_force, max_force);
+	float net_torque = m_drive_torque - tire_torque - rolling_torque - m_brake_torque;
+	float alpha = net_torque / m_inertia;
+	m_angular_velocity += alpha * delta;
 
-    float tire_torque = m_long_force * m_wheel_radius;
+	//if (Math::abs(m_drive_torque) < 0.001f) {
+	//	m_angular_velocity *= Math::max(0.0f, 1.0f - 0.5f * delta);
+	//}
 
-    float net_torque = m_drive_torque - tire_torque - rolling_torque - m_brake_torque;
-    float alpha = net_torque / m_inertia;
-    m_angular_velocity += alpha * delta;
-
-    m_reaction_torque = tire_torque + rolling_torque;
+	m_reaction_torque = tire_torque + rolling_torque;
 }
 
 void MoVeWheel::set_ground_speed(float v_mps) { m_ground_speed = v_mps; }
@@ -35,23 +35,23 @@ float MoVeWheel::get_ground_speed() const { return m_ground_speed; }
 float MoVeWheel::get_angular_velocity() const { return m_angular_velocity; }
 
 void MoVeWheel::set_drive_torque(float t) {
-    m_drive_torque = m_is_powered ? t : 0.0f;
+	m_drive_torque = m_is_powered ? t : 0.0f;
 }
 
 void MoVeWheel::set_brake_torque(float t) {
-    m_brake_torque = t;
+	m_brake_torque = t;
 }
 
 void MoVeWheel::set_normal_force(float f) {
-    m_normal_force = Math::max(f, 0.0f);
+	m_normal_force = Math::max(f, 0.0f);
 }
 
 float MoVeWheel::get_longitudinal_force() const {
-    return m_long_force;
+	return m_long_force;
 }
 
 float MoVeWheel::get_reaction_torque() const {
-    return m_reaction_torque;
+	return m_reaction_torque;
 }
 
 void MoVeWheel::set_is_powered(bool v) { m_is_powered = v; }
@@ -70,22 +70,22 @@ void MoVeWheel::set_wheel_radius(float v) { m_wheel_radius = v; }
 float MoVeWheel::get_wheel_radius() const { return m_wheel_radius; }
 
 void MoVeWheel::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_is_powered", "value"), &MoVeWheel::set_is_powered);
-    ClassDB::bind_method(D_METHOD("get_is_powered"), &MoVeWheel::get_is_powered);
-    ClassDB::bind_method(D_METHOD("set_spring_strength", "value"), &MoVeWheel::set_spring_strength);
-    ClassDB::bind_method(D_METHOD("get_spring_strength"), &MoVeWheel::get_spring_strength);
-    ClassDB::bind_method(D_METHOD("set_spring_damping", "value"), &MoVeWheel::set_spring_damping);
-    ClassDB::bind_method(D_METHOD("get_spring_damping"), &MoVeWheel::get_spring_damping);
-    ClassDB::bind_method(D_METHOD("set_resting_distnace", "value"), &MoVeWheel::set_resting_distnace);
-    ClassDB::bind_method(D_METHOD("get_resting_distnace"), &MoVeWheel::get_resting_distnace);
-    ClassDB::bind_method(D_METHOD("set_wheel_radius", "value"), &MoVeWheel::set_wheel_radius);
-    ClassDB::bind_method(D_METHOD("get_wheel_radius"), &MoVeWheel::get_wheel_radius);
+	ClassDB::bind_method(D_METHOD("set_is_powered", "value"), &MoVeWheel::set_is_powered);
+	ClassDB::bind_method(D_METHOD("get_is_powered"), &MoVeWheel::get_is_powered);
+	ClassDB::bind_method(D_METHOD("set_spring_strength", "value"), &MoVeWheel::set_spring_strength);
+	ClassDB::bind_method(D_METHOD("get_spring_strength"), &MoVeWheel::get_spring_strength);
+	ClassDB::bind_method(D_METHOD("set_spring_damping", "value"), &MoVeWheel::set_spring_damping);
+	ClassDB::bind_method(D_METHOD("get_spring_damping"), &MoVeWheel::get_spring_damping);
+	ClassDB::bind_method(D_METHOD("set_resting_distnace", "value"), &MoVeWheel::set_resting_distnace);
+	ClassDB::bind_method(D_METHOD("get_resting_distnace"), &MoVeWheel::get_resting_distnace);
+	ClassDB::bind_method(D_METHOD("set_wheel_radius", "value"), &MoVeWheel::set_wheel_radius);
+	ClassDB::bind_method(D_METHOD("get_wheel_radius"), &MoVeWheel::get_wheel_radius);
 
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "is_powered"), "set_is_powered", "get_is_powered");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "is_powered"), "set_is_powered", "get_is_powered");
 
-    ADD_GROUP("properties", "");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spring_strength"), "set_spring_strength", "get_spring_strength");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spring_damping"), "set_spring_damping", "get_spring_damping");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "resting_distnace"), "set_resting_distnace", "get_resting_distnace");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "wheel_radius"), "set_wheel_radius", "get_wheel_radius");
+	ADD_GROUP("properties", "");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spring_strength"), "set_spring_strength", "get_spring_strength");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "spring_damping"), "set_spring_damping", "get_spring_damping");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "resting_distnace"), "set_resting_distnace", "get_resting_distnace");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "wheel_radius"), "set_wheel_radius", "get_wheel_radius");
 }

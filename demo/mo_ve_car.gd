@@ -16,7 +16,8 @@ func _physics_process(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("shift_up"): transmission.shift_up()
 	if Input.is_action_just_pressed("shift_down"): transmission.shift_down()
-	print(engine.get_current_rpm())
+	print("engine rpm: ", engine.get_current_rpm())
+	print("\tcar speed: ", linear_velocity.length())
 	#print(transmission.get_current_gear())
 	
 	if Input.is_action_pressed("throttle"):
