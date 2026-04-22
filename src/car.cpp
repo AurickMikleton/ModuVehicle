@@ -98,14 +98,14 @@ void MoVeCar::update_acceleration(float delta) {
 
 		wheel->update_visual_rotation(delta);
 
-		UtilityFunctions::print(vformat(
-			"wheel %d: colliding=%s powered=%s ang_vel=%.3f ground_speed=%.3f",
-			i,
-			wheel->is_colliding() ? "true" : "false",
-			wheel->get_is_powered() ? "true" : "false",
-			wheel->get_angular_velocity(),
-			wheel->get_ground_speed()
-		));
+		//UtilityFunctions::print(vformat(
+		//	"wheel %d: colliding=%s powered=%s ang_vel=%.3f ground_speed=%.3f",
+		//	i,
+		//	wheel->is_colliding() ? "true" : "false",
+		//	wheel->get_is_powered() ? "true" : "false",
+		//	wheel->get_angular_velocity(),
+		//	wheel->get_ground_speed()
+		//));
 
 		if (!wheel->is_driveline_active())
 			continue;
@@ -126,7 +126,6 @@ void MoVeCar::update_acceleration(float delta) {
 
 	float engine_rpm = (float)m_engine->get_current_rpm();
 	float engine_omega = engine_rpm * (Math_TAU / 60.0f);
-	float target_wheel_omega = engine_omega / gear;
 	float trans_input_omega = avg_wheel_omega * gear;
 
 	float slip_omega = engine_omega - trans_input_omega;
@@ -150,12 +149,23 @@ void MoVeCar::update_acceleration(float delta) {
 
 
 	float clutch_torque = m_transmission->clutch_torque(engine_rpm, slip_omega);
+	clutch_torque = Math::abs(clutch_torque);
 
-	m_engine->set_reflected_load(Math::abs(clutch_torque));
+	m_engine->set_reflected_load(clutch_torque);
 	m_engine->update_rpm(delta);
 
 	float driveshaft_torque = clutch_torque * gear;
 	float torque_per_wheel = driveshaft_torque / (float)powered;
+
+	UtilityFunctions::print(vformat(
+		"clutch_torque=%.2f prev_engine_torque=%.2f drive_torque=%.2f throttle=%.2f",
+		clutch_torque,
+		m_engine->engine_torque(engine_rpm),
+		driveshaft_torque,
+		m_engine-> get_throttle()
+	));
+
+
 
 	for (auto &wheel : wheels) {
 		if (!wheel->is_driveline_active())

@@ -4,7 +4,8 @@ float MoVeTransmission::clutch_engagement(float engine_rpm) const {
 	float t = (engine_rpm - m_clutch_engage_rpm) /
 			(m_clutch_full_rpm - m_clutch_engage_rpm);
 	t = Math::clamp(t, 0.0f, 1.0f);
-	return t * t * (3.0f - 2.0f * t);
+	//float smoothstep = t * t * (3.0f - 2.0f * t);
+	return t;
 }
 
 float MoVeTransmission::clutch_capacity(float engine_rpm) const {
@@ -12,9 +13,10 @@ float MoVeTransmission::clutch_capacity(float engine_rpm) const {
 }
 
 float MoVeTransmission::clutch_torque(float engine_rpm, float slip_omega) const {
-	float capacity = clutch_capacity(engine_rpm);
+	float engagement = clutch_engagement(engine_rpm);
+	float capacity = engagement * m_clutch_max_torque;
 	float torque = slip_omega * m_clutch_k;
-	return Math::clamp(torque, -capacity, capacity);
+	return Math::clamp(torque, -capacity, capacity) * engagement;
 }
 
 float MoVeTransmission::get_gear_ratio() const {
