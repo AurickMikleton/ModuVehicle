@@ -12,7 +12,6 @@ void MoVeWheel::integrate(float delta) {
 	float stiffness = 4000.0f; // N per slip (tune)
 	float desired_force = slip * stiffness;
 
-	float speed = Math::abs(m_ground_speed);
 	float max_force = m_mu * m_normal_force;
 	m_long_force = Math::clamp(desired_force, -max_force, max_force);
 
@@ -22,11 +21,64 @@ void MoVeWheel::integrate(float delta) {
 	float alpha = net_torque / m_inertia;
 	m_angular_velocity += alpha * delta;
 
-	//if (Math::abs(m_drive_torque) < 0.001f) {
-	//	m_angular_velocity *= Math::max(0.0f, 1.0f - 0.5f * delta);
-	//}
-
 	m_reaction_torque = tire_torque + rolling_torque;
+}
+
+void MoVeWheel::cache_contact_kinematics(
+	const Vector3 &car_linear_velocity,
+    const Vector3 &car_angular_velocity,
+    const Vector3 &car_position
+) {
+	if (!is_colliding()) {
+		m_cached_ground_speed = 0.0f;
+		m_cached_force_offset = get_global_position() - car_position;
+		m_cached_long_force_vector = Vector3();
+		return;
+	}
+
+	Vector3 forward = -get_global_transform().get_basis().get_column(2);
+	Vector3 contact = get_collision_point();
+	Vector3 r = contact - car_position;
+	Vector3 v_contact = car_linear_velocity + car_angular_velocity.cross(r);
+
+	m_cached_ground_speed = forward.dot(v_contact);
+		m_cached_ground_speed / Math::max(m_wheel_radius, 0.001f);
+	m_cached_force_offset = r;
+	m_cached_forward = forward;
+}
+
+void MoVeWheel::update_visual_rotation(float delta) {
+	Node3D *wheel_mesh = get_node<Node3D>("wheel");
+	if (!wheel_mesh)
+		return;
+
+	float visual_omega = m_cached_ground_speed / Math::max(m_wheel_radius, 0.001f);
+	wheel_mesh->rotate_x(-visual_omega * delta);
+}
+
+void MoVeWheel::apply_drive_torque_and_integrate(float drive_torque, float delta) {
+	set_ground_speed(m_cached_ground_speed);
+	set_drive_torque(drive_torque);
+	integrate(delta);
+
+	m_cached_long_force_vector = m_cached_forward * get_longitudinal_force();
+}
+
+bool MoVeWheel::is_driveline_active() const {
+	return get_is_powered() && is_colliding();
+}
+
+
+float MoVeWheel::get_cached_ground_speed() const {
+	return m_cached_ground_speed;
+}
+
+Vector3 MoVeWheel::get_cached_longitudinal_force_vector() const {
+	return m_cached_long_force_vector;
+}
+
+Vector3 MoVeWheel::get_cached_force_offset() const {
+	return m_cached_force_offset;
 }
 
 void MoVeWheel::set_ground_speed(float v_mps) { m_ground_speed = v_mps; }

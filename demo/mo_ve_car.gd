@@ -12,11 +12,9 @@ func _physics_process(delta: float) -> void:
 	update_suspension(delta)
 	update_acceleration(delta)
 	update_traction(delta)
-	#engine.update_rpm(delta)
 	
 	if Input.is_action_just_pressed("shift_up"): transmission.shift_up()
 	if Input.is_action_just_pressed("shift_down"): transmission.shift_down()
-	print("engine rpm: ", engine.get_current_rpm())
 	print("\tcar speed: ", linear_velocity.length())
 	#print(transmission.get_current_gear())
 	

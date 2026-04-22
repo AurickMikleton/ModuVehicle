@@ -26,14 +26,32 @@ public:
 	float m_reaction_torque = 0.0f; // Nm
 	float m_long_force = 0.0f; // N
 
+	float m_cached_ground_speed = 0.0f;
+	Vector3 m_cached_long_force_vector = Vector3();
+	Vector3 m_cached_force_offset = Vector3();
+	Vector3 m_cached_forward = Vector3();
+
 	GDCLASS(MoVeWheel, RayCast3D);
 
 protected:
 	static void _bind_methods();
 
 public:
-	float get_resistance_torque() const;
-	void integrate(float delta);
+	float get_resistance_torque() const; // unused
+	void integrate(float delta); // abstract
+
+	bool is_driveline_active() const; // abstract
+	void cache_contact_kinematics( // abstract
+		const Vector3 &car_linear_velocity,
+		const Vector3 &car_angular_velocity,
+		const Vector3 &car_position
+	);
+	void update_visual_rotation(float delta); // abstract
+	void apply_drive_torque_and_integrate(float drive_torque, float delta); // abstract
+
+	float get_cached_ground_speed() const; // abstract
+	Vector3 get_cached_longitudinal_force_vector() const; // abstract
+	Vector3 get_cached_force_offset() const; // abstract
 
 	void set_drive_torque(float t);
 	void set_brake_torque(float t);

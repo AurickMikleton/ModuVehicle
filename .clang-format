@@ -3,6 +3,7 @@
 # chosen value in case the base style changes (last sync: Clang 14.0).
 ---
 ### General config, applies to all languages ###
+DisableFormat: true
 BasedOnStyle:  LLVM
 AccessModifierOffset: -4
 AlignAfterOpenBracket: DontAlign

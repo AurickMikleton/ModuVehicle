@@ -1,5 +1,7 @@
 #include "car.hpp"
 
+#include <godot_cpp/variant/utility_functions.hpp>
+
 using namespace godot;
 
 void MoVeCar::_ready() {
@@ -80,28 +82,47 @@ void MoVeCar::update_suspension(float delta) {
 
 void MoVeCar::update_acceleration(float delta) {
 	int powered = 0;
-	float avg_wheel_omega = 0.0f;
-	float avg_speed = 0.0f;
+	float sum_wheel_omega = 0.0f;
+	float sum_ground_speed = 0.0f;
 
 	float gear = m_transmission->get_gear_ratio();
 
+	int i = 0;
 	for (auto &wheel : wheels) {
-		if (!wheel->get_is_powered() || !wheel->is_colliding())
+		i++;
+		wheel->cache_contact_kinematics(
+			get_linear_velocity(),
+			get_angular_velocity(),
+			get_global_position()
+		);
+
+		wheel->update_visual_rotation(delta);
+
+		UtilityFunctions::print(vformat(
+			"wheel %d: colliding=%s powered=%s ang_vel=%.3f ground_speed=%.3f",
+			i,
+			wheel->is_colliding() ? "true" : "false",
+			wheel->get_is_powered() ? "true" : "false",
+			wheel->get_angular_velocity(),
+			wheel->get_ground_speed()
+		));
+
+		if (!wheel->is_driveline_active())
 			continue;
 
 		powered++;
-		avg_wheel_omega += wheel->get_angular_velocity();
-
-		Vector3 forward = -wheel->get_global_transform().get_basis().get_column(2);
-		Vector3 contact = wheel->get_collision_point();
-		Vector3 r = contact - get_global_position();
-		Vector3 v_contact = get_linear_velocity() + get_angular_velocity().cross(r);
-
-		avg_speed += forward.dot(v_contact);
+		sum_wheel_omega += wheel->get_angular_velocity();
+		sum_ground_speed += wheel->get_cached_ground_speed();
 	}
 
-	avg_wheel_omega /= (float)powered;
-	avg_speed /= (float)powered;
+	if (Math::is_zero_approx(gear) || powered == 0) {
+		m_engine->set_reflected_load(0.0f);
+		m_engine->update_rpm(delta);
+		return;
+	}
+
+	float avg_wheel_omega = sum_wheel_omega / (float)powered;
+	float avg_speed = sum_ground_speed / (float)powered;
 
 	float engine_rpm = (float)m_engine->get_current_rpm();
 	float engine_omega = engine_rpm * (Math_TAU / 60.0f);
@@ -109,43 +130,45 @@ void MoVeCar::update_acceleration(float delta) {
 
 	float slip_omega = engine_omega - trans_input_omega;
 
+
+	UtilityFunctions::print(vformat(
+		"powered_count=%d sum_wheel_omega=%.3f avg_wheel_omega=%.3f gear=%.3f trans_input_omega=%.3f",
+		powered,
+		sum_wheel_omega,
+		avg_wheel_omega,
+		gear,
+		trans_input_omega
+	));
+
+
+	float engine_rpm_before = m_engine->get_current_rpm();
+	float engine_omega_before = engine_rpm_before * (Math_TAU / 60.0f);
+
+	UtilityFunctions::print(vformat(
+		"rpm_before=%.2f trans_in=%.2f slip=%.2f",
+		engine_rpm_before,
+		trans_input_omega * (60.0f / Math_TAU),
+		slip_omega
+	));
+
+
 	float clutch_torque = m_transmission->clutch_torque(engine_rpm, slip_omega);
 
-	// Load seen from clutch opposes engine rotation
 	m_engine->set_reflected_load(clutch_torque);
-
-	if (Math::is_zero_approx(gear)) {
-		m_engine->set_reflected_load(0.0f);
-	}
-	if (powered == 0) {
-		m_engine->set_reflected_load(0.0f);
-		return;
-	}
-
 	m_engine->update_rpm(delta);
 
-	// Send clutch torque to wheels through gearing
 	float driveshaft_torque = clutch_torque * gear;
 	float torque_per_wheel = driveshaft_torque / (float)powered;
 
 	for (auto &wheel : wheels) {
-		Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
-		// Check if mesh exits
-		wheel_mesh->rotate_x((-avg_speed * delta) / wheel->get_wheel_radius());
-		if (!wheel->get_is_powered() || !wheel->is_colliding())
+		if (!wheel->is_driveline_active())
 			continue;
 
-		Vector3 forward = -wheel->get_global_transform().get_basis().get_column(2);
-		Vector3 contact = wheel->get_collision_point();
-		Vector3 r = contact - get_global_position();
-
-		Vector3 v_contact = get_linear_velocity() + get_angular_velocity().cross(r);
-		float ground_speed = forward.dot(v_contact);
-		wheel->set_ground_speed(ground_speed);
-
-		wheel->set_drive_torque(torque_per_wheel);
-		wheel->integrate(delta);
-		apply_force(forward * wheel->get_longitudinal_force(), r);
+		wheel->apply_drive_torque_and_integrate(torque_per_wheel, delta);
+		apply_force(
+			wheel->get_cached_longitudinal_force_vector(),
+			wheel->get_cached_force_offset()
+		);
 	}
 }
 

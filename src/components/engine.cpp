@@ -55,7 +55,7 @@ void GasEngine::update_rpm(double delta) {
 	}
 
 	double engine_alpha = engine_net_torque / Math::max(m_inertia, 0.001);
-	double engine_omega = m_current_rpm * (Math_TAU / 60.0); // "60.0" converts rads to rpm
+	double engine_omega = m_current_rpm * (Math_TAU / 60.0); // "60.0" converts rpm to rads
 	//
 	engine_omega += engine_alpha * delta;
 

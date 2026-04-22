@@ -124,7 +124,6 @@ shape = SubResource("ConvexPolygonShape3D_n51mc")
 
 [node name="MoVeExhaust" type="MoVeExhaust" parent="MoVeCar"]
 engine = ExtResource("1_ugfer")
-cylinders = 8
 stream = SubResource("AudioStreamGenerator_8lvy3")
 script = ExtResource("3_8lvy3")
 
