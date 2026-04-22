@@ -126,6 +126,7 @@ void MoVeCar::update_acceleration(float delta) {
 
 	float engine_rpm = (float)m_engine->get_current_rpm();
 	float engine_omega = engine_rpm * (Math_TAU / 60.0f);
+	float target_wheel_omega = engine_omega / gear;
 	float trans_input_omega = avg_wheel_omega * gear;
 
 	float slip_omega = engine_omega - trans_input_omega;
@@ -140,13 +141,9 @@ void MoVeCar::update_acceleration(float delta) {
 		trans_input_omega
 	));
 
-
-	float engine_rpm_before = m_engine->get_current_rpm();
-	float engine_omega_before = engine_rpm_before * (Math_TAU / 60.0f);
-
 	UtilityFunctions::print(vformat(
 		"rpm_before=%.2f trans_in=%.2f slip=%.2f",
-		engine_rpm_before,
+		engine_rpm,
 		trans_input_omega * (60.0f / Math_TAU),
 		slip_omega
 	));
@@ -154,7 +151,7 @@ void MoVeCar::update_acceleration(float delta) {
 
 	float clutch_torque = m_transmission->clutch_torque(engine_rpm, slip_omega);
 
-	m_engine->set_reflected_load(clutch_torque);
+	m_engine->set_reflected_load(Math::abs(clutch_torque));
 	m_engine->update_rpm(delta);
 
 	float driveshaft_torque = clutch_torque * gear;

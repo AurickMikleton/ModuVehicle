@@ -17,7 +17,7 @@ private:
 
 	float m_clutch_engage_rpm = 1200.0f; // starts biting
 	float m_clutch_full_rpm = 2800.0f; // fully clamped
-	float m_clutch_max_torque = 500.0f; // Nm max transferable
+	float m_clutch_max_torque = 800.0f; // Nm max transferable
 	float m_clutch_k = 6.0f; // Nm per (rad/s) of slip
 
 protected:
@@ -28,10 +28,6 @@ public:
 
 	void shift_up();
 	void shift_down();
-
-	// Legacy block; delete when possible
-	bool should_lock(float engine_rpm, float slip_omega, float throttle) const;
-	float coupling_torque(float slip_omega) const;
 
 	float clutch_capacity(float engine_rpm) const;
 	float clutch_torque(float engine_rpm, float slip_omega) const;

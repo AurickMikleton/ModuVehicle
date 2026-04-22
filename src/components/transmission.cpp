@@ -1,16 +1,8 @@
 #include "transmission.hpp"
 
 float MoVeTransmission::clutch_engagement(float engine_rpm) const {
-	if (engine_rpm <= m_clutch_engage_rpm) {
-		return 0.0f;
-	}
-	if (engine_rpm >= m_clutch_full_rpm) {
-		return 1.0f;
-	}
-
 	float t = (engine_rpm - m_clutch_engage_rpm) /
 			(m_clutch_full_rpm - m_clutch_engage_rpm);
-
 	t = Math::clamp(t, 0.0f, 1.0f);
 	return t * t * (3.0f - 2.0f * t);
 }

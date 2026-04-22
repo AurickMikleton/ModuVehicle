@@ -42,7 +42,6 @@ void MoVeWheel::cache_contact_kinematics(
 	Vector3 v_contact = car_linear_velocity + car_angular_velocity.cross(r);
 
 	m_cached_ground_speed = forward.dot(v_contact);
-		m_cached_ground_speed / Math::max(m_wheel_radius, 0.001f);
 	m_cached_force_offset = r;
 	m_cached_forward = forward;
 }
