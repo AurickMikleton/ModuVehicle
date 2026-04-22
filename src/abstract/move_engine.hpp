@@ -22,5 +22,4 @@ public:
 	virtual double get_idle_rpm() const = 0;
 
 	virtual double get_current_rpm() const = 0;
-	virtual void set_current_rpm(double value) = 0;
 };

@@ -14,13 +14,11 @@ double GasEngine::get_load_torque(double rpm) const {
 }
 
 double GasEngine::engine_torque(double rpm) {
-	// displacement in liters
-	double displacement_l = GasEngine::displacement_liters();
+	double displacement_liters = GasEngine::displacement_liters();
 
 	// naturally aspirated peak torque
-	double torque_peak = k_nm_per_liter * displacement_l;
+	double torque_peak = k_nm_per_liter * displacement_liters;
 
-	// peak RPM, base on bore/stroke ratio
 	double bore_stroke_ratio = m_bore / m_stroke;
 	double rpm_peak = m_peak_rpm_base * bore_stroke_ratio;
 
@@ -49,35 +47,21 @@ double GasEngine::engine_torque(double rpm) {
 }
 
 void GasEngine::update_rpm(double delta) {
-	// get torque values
-	double torque = engine_torque(m_current_rpm);
-	double torque_load = get_load_torque(m_current_rpm);
-	double torque_net = torque - torque_load - m_reflected_load;
+	double engine_net_torque = engine_torque(m_current_rpm) - m_reflected_load;
 
+	// Closed-throttle engine drag
 	if (m_throttle < 0.02) {
-		torque_net -= 20.0 + 0.02 * m_current_rpm; // tune
+		engine_net_torque -= 20.0 + 0.02 * m_current_rpm; // tune
 	}
 
-	if (m_throttle < 0.02) {
-		double rpm_error = m_idle_rpm - m_current_rpm;
-		if (rpm_error > 0.0) {
-			double idle_torque =
-					Math::clamp(rpm_error * m_idle_kp, 0.0, m_idle_max_torque);
-			torque_net += idle_torque;
-		}
-	}
+	double engine_alpha = engine_net_torque / Math::max(m_inertia, 0.001);
+	double engine_omega = m_current_rpm * (Math_TAU / 60.0); // "60.0" converts rads to rpm
+	//
+	engine_omega += engine_alpha * delta;
 
-	// alpha = torque_net / I ; omega_new = omega + alpha*delta
-	double omega = m_current_rpm * (Math_TAU / 60.0f); // "60.0" converts rads to rpm
-	double alpha = torque_net / m_inertia;
-	omega += alpha * delta;
-
-	if (omega < 0.0f)
-		omega = 0.0f;
-	m_current_rpm = omega * (60.0 / Math_TAU); // "60.0" converts rads to rpm
-
-	m_current_rpm = Math::min(m_current_rpm, m_redline_rpm); // no idle clamp
-	//m_current_rpm = Math::clamp(m_current_rpm, m_idle_rpm, m_redline_rpm);
+	double idle_omega = m_idle_rpm * (Math_TAU / 60.0);
+	engine_omega = Math::max(engine_omega, idle_omega);
+	m_current_rpm = (engine_omega * (60.0 / Math_TAU));
 }
 
 void GasEngine::set_reflected_load(double v) { m_reflected_load = v; }

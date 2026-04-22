@@ -71,23 +71,21 @@ void MoVeCar::update_suspension(float delta) {
 	}
 }
 
+// Goal layout for update_acceleration
+//engine_torque = m_engine->engine_torque(engine_rpm);
+//clutch_torque = m_transmission->clutch_torque(engine_rpm, slip);
+//m_engine->apply_load(clutch_torque, delta);
+//m_transmission->apply_input_torque(clutch_torque);
+//wheel_torque = m_transmission->output_torque(clutch_torque);
+
 void MoVeCar::update_acceleration(float delta) {
 	int powered = 0;
 	float avg_wheel_omega = 0.0f;
 	float avg_speed = 0.0f;
 
 	float gear = m_transmission->get_gear_ratio();
-	if (Math::is_zero_approx(gear)) {
-		m_engine->set_reflected_load(0.0f);
-		return;
-	}
 
 	for (auto &wheel : wheels) {
-		//Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
-		//if (wheel_mesh) {
-		//	wheel_mesh->rotate_x((-wheel->get_angular_velocity() * delta));
-		//}
-
 		if (!wheel->get_is_powered() || !wheel->is_colliding())
 			continue;
 
@@ -102,11 +100,6 @@ void MoVeCar::update_acceleration(float delta) {
 		avg_speed += forward.dot(v_contact);
 	}
 
-	if (powered == 0) {
-		m_engine->set_reflected_load(0.0f);
-		return;
-	}
-
 	avg_wheel_omega /= (float)powered;
 	avg_speed /= (float)powered;
 
@@ -118,21 +111,18 @@ void MoVeCar::update_acceleration(float delta) {
 
 	float clutch_torque = m_transmission->clutch_torque(engine_rpm, slip_omega);
 
-	// Engine produces torque
-	float engine_torque = (float)m_engine->engine_torque(engine_rpm);
-
 	// Load seen from clutch opposes engine rotation
-	float reflected_load = Math::abs(clutch_torque);
-	m_engine->set_reflected_load(reflected_load);
+	m_engine->set_reflected_load(clutch_torque);
 
-	float engine_net_torque = engine_torque - clutch_torque;
-	float engine_inertia = 0.35f; // expose later
-	float engine_alpha = engine_net_torque / Math::max(engine_inertia, 0.001f);
-	engine_omega += engine_alpha * delta;
+	if (Math::is_zero_approx(gear)) {
+		m_engine->set_reflected_load(0.0f);
+	}
+	if (powered == 0) {
+		m_engine->set_reflected_load(0.0f);
+		return;
+	}
 
-	float idle_omega = (float)m_engine->get_idle_rpm() * (Math_TAU / 60.0f);
-	engine_omega = Math::max(engine_omega, idle_omega);
-	m_engine->set_current_rpm(engine_omega * (60.0f / Math_TAU));
+	m_engine->update_rpm(delta);
 
 	// Send clutch torque to wheels through gearing
 	float driveshaft_torque = clutch_torque * gear;
@@ -158,113 +148,6 @@ void MoVeCar::update_acceleration(float delta) {
 		apply_force(forward * wheel->get_longitudinal_force(), r);
 	}
 }
-
-//void MoVeCar::update_acceleration(float delta) {
-//	int powered = 0;
-//	float avg_omega = 0.0f; // rad/s
-//	float avg_speed = 0.0f; // m/s along wheel forward at contact
-//
-//	float gear = m_transmission->get_gear_ratio();
-//	if (gear == 0.0f) {
-//		m_engine->set_reflected_load(0.0f);
-//		return;
-//	}
-//
-//	// Gather powered wheel omega + contact speed
-//	for (auto &wheel : wheels) {
-//		if (!wheel->get_is_powered() || !wheel->is_colliding())
-//			continue;
-//		powered++;
-//
-//		avg_omega += wheel->get_angular_velocity();
-//
-//		Vector3 forward = -wheel->get_global_transform().get_basis().get_column(2);
-//		Vector3 contact = wheel->get_collision_point();
-//		Vector3 r = contact - get_global_position(); // FML I already did the thing
-//
-//		Vector3 v_contact = get_linear_velocity() + get_angular_velocity().cross(r);
-//		float ground_speed = forward.dot(v_contact);
-//
-//		avg_speed += ground_speed;
-//	}
-//
-//	if (powered == 0) {
-//		m_engine->set_reflected_load(0.0f);
-//		return;
-//	}
-//
-//	avg_omega /= (float)powered;
-//	avg_speed /= (float)powered;
-//
-//	float abs_speed = Math::abs(avg_speed);
-//
-//	float uncoupled_velocity = 0.4f; // Below ~0.4 m/s: hold idle
-//	float couple_transition = (abs_speed - uncoupled_velocity) / uncoupled_velocity;
-//	float couple = Math::clamp(couple_transition, 0.0f, 1.0f); // Ensure couple transition is unit
-//
-//	couple = couple * couple * (3.0f - 2.0f * couple); // smoothstep
-//
-//	float throttle = (float)m_engine->get_throttle();
-//	// 0.05 at idle, up to 0.25 when throttle is pressed a bit, initial coupling based on throttle
-//	float couple_min = Math::lerp(0.05f, 0.25f, Math::clamp(throttle / 0.2f, 0.0f, 1.0f));
-//	couple = Math::max(couple, couple_min);
-//
-//	// Compute wheel implied engine rpm
-//	float target_rpm_raw = Math::abs(avg_omega * gear) * (60.0f / Math_TAU);
-//	float idle_rpm = (float)m_engine->get_idle_rpm();
-//
-//	// Don't let wheels pull the engine below idle when nearly stopped
-//	float target_rpm = target_rpm_raw;
-//	if (abs_speed < 0.8f) {
-//		target_rpm = Math::max(target_rpm, idle_rpm);
-//	}
-//
-//	// Smooth-lock strength, scaled by coupling
-//	float rpm = (float)m_engine->get_current_rpm();
-//	float lock_strength = 22.0f; // base, tune 6..20 TODO make into an argument
-//	float blend = 1.0f - Math::exp(-(lock_strength * couple) * delta);
-//
-//	float new_rpm = Math::lerp(rpm, target_rpm, blend);
-//	m_engine->set_current_rpm(new_rpm);
-//
-//	// Engine torque through gearing to wheels
-//	float T_engine = (float)m_engine->engine_torque(new_rpm);
-//	float driveshaft_torque = T_engine * gear;
-//	float torque_per_wheel = driveshaft_torque / (float)powered;
-//
-//	float total_wheel_load = 0.0f;
-//
-//	for (auto &wheel : wheels) {
-//		Node3D *wheel_mesh = wheel->get_node<Node3D>("wheel");
-//		wheel_mesh->rotate_x((-avg_speed * delta) / wheel->get_wheel_radius());
-//		if (!wheel->get_is_powered() || !wheel->is_colliding())
-//			continue;
-//
-//		Vector3 forward = -wheel->get_global_transform().get_basis().get_column(2);
-//		Vector3 contact = wheel->get_collision_point();
-//		Vector3 r = contact - get_global_position();
-//
-//		Vector3 v_contact = get_linear_velocity() + get_angular_velocity().cross(r);
-//		float ground_speed = forward.dot(v_contact);
-//		wheel->set_ground_speed(ground_speed);
-//
-//		wheel->set_drive_torque(torque_per_wheel * couple);
-//		wheel->integrate(delta);
-//		apply_force(forward * wheel->get_longitudinal_force(), r);
-//
-//		total_wheel_load += Math::abs(wheel->get_reaction_torque());
-//	}
-//
-//	// Reflect load back to engine
-//	float reflected = 0.0f;
-//	float gear_abs = Math::abs(gear);
-//	if (gear_abs > 0.001f)
-//		reflected = total_wheel_load / gear_abs;
-//
-//	reflected *= couple;
-//
-//	m_engine->set_reflected_load(reflected);
-//}
 
 void MoVeCar::update_traction(float delta) {
 	for (auto &wheel : wheels) {

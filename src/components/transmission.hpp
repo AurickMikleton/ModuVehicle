@@ -12,13 +12,13 @@ class MoVeTransmission : public Resource {
 private:
 	GDCLASS(MoVeTransmission, Resource); // maybe, this class might be abstract
 	TypedArray<float> m_gear_ratios; // R N 1 2 3 4
-	int m_current_gear = 2;
-	float m_final_drive = 3.7f;
+	int m_current_gear = 1;
+	float m_final_drive = 3.7f; // 3.7
 
-	float m_clutch_engage_rpm = 1400.0f; // starts biting
+	float m_clutch_engage_rpm = 1200.0f; // starts biting
 	float m_clutch_full_rpm = 2800.0f; // fully clamped
-	float m_clutch_max_torque = 1200.0f; // Nm max transferable
-	float m_clutch_k = 20.0f; // Nm per (rad/s) of slip
+	float m_clutch_max_torque = 500.0f; // Nm max transferable
+	float m_clutch_k = 6.0f; // Nm per (rad/s) of slip
 
 protected:
 	static void _bind_methods();

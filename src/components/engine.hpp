@@ -24,7 +24,7 @@ private:
 	double m_idle_rpm = 900.0;
 	double m_redline_rpm = 7000.0; // nvm
 	double m_friction_coeff = 8.0f; // Nm per 1000 rpm
-	double m_inertia = 0.15f;
+	double m_inertia = 0.35f;
 	//turbo
 	double m_wastegate_bar = 0.8; // max boost in bar
 	double m_spool_rpm = 2500.0; // rpm, turbo reaches efficiency island
