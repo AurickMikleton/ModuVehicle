@@ -148,8 +148,14 @@ void MoVeCar::update_acceleration(float delta) {
 		slip_omega
 	));
 
-
+	float engine_torque = m_engine->engine_torque(engine_rpm);
 	float clutch_torque = m_transmission->clutch_torque(engine_rpm, slip_omega);
+
+	if (engine_torque >= 0.0f) {
+		clutch_torque = Math::clamp(clutch_torque, 0.0f, engine_torque);
+	} else {
+		clutch_torque = Math::clamp(clutch_torque, engine_torque, 0.0f);
+	}
 
 	m_engine->set_reflected_load(Math::abs(clutch_torque));
 	m_engine->update_rpm(delta);
