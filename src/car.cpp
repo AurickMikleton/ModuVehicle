@@ -98,14 +98,14 @@ void MoVeCar::update_acceleration(float delta) {
 
 		wheel->update_visual_rotation(delta);
 
-		UtilityFunctions::print(vformat(
-			"wheel %d: colliding=%s powered=%s ang_vel=%.3f ground_speed=%.3f",
-			i,
-			wheel->is_colliding() ? "true" : "false",
-			wheel->get_is_powered() ? "true" : "false",
-			wheel->get_angular_velocity(),
-			wheel->get_ground_speed()
-		));
+		//UtilityFunctions::print(vformat(
+		//	"wheel %d: colliding=%s powered=%s ang_vel=%.3f ground_speed=%.3f",
+		//	i,
+		//	wheel->is_colliding() ? "true" : "false",
+		//	wheel->get_is_powered() ? "true" : "false",
+		//	wheel->get_angular_velocity(),
+		//	wheel->get_ground_speed()
+		//));
 
 		if (!wheel->is_driveline_active())
 			continue;
@@ -122,14 +122,12 @@ void MoVeCar::update_acceleration(float delta) {
 	}
 
 	float avg_wheel_omega = sum_wheel_omega / (float)powered;
-	float avg_speed = sum_ground_speed / (float)powered;
 
 	float engine_rpm = (float)m_engine->get_current_rpm();
 	float engine_omega = engine_rpm * (Math_TAU / 60.0f);
-	float target_wheel_omega = engine_omega / gear;
 	float trans_input_omega = avg_wheel_omega * gear;
 
-	float slip_omega = engine_omega - trans_input_omega;
+	float slip_omega = engine_omega - Math::abs(trans_input_omega);
 
 
 	UtilityFunctions::print(vformat(
@@ -148,20 +146,22 @@ void MoVeCar::update_acceleration(float delta) {
 		slip_omega
 	));
 
+	float throttle = (float) m_engine->get_throttle();
 	float engine_torque = m_engine->engine_torque(engine_rpm);
 	float clutch_torque = m_transmission->clutch_torque(engine_rpm, slip_omega);
+	UtilityFunctions::print(vformat(
+		"throttle=%.2f engine_torque=%.2f clutch_torque=%.2f",
+		throttle,
+		engine_torque,
+		clutch_torque
+	));
 
-	if (engine_torque >= 0.0f) {
-		clutch_torque = Math::clamp(clutch_torque, 0.0f, engine_torque);
-	} else {
-		clutch_torque = Math::clamp(clutch_torque, engine_torque, 0.0f);
-	}
 
 	m_engine->set_reflected_load(Math::abs(clutch_torque));
 	m_engine->update_rpm(delta);
 
 	float driveshaft_torque = clutch_torque * gear;
-	float torque_per_wheel = driveshaft_torque / (float)powered;
+	float torque_per_wheel = driveshaft_torque / (float) powered;
 
 	for (auto &wheel : wheels) {
 		if (!wheel->is_driveline_active())

@@ -10,13 +10,12 @@ double GasEngine::displacement_liters() const {
 
 double GasEngine::get_load_torque(double rpm) const {
 	// simple speed-proportional load
-	return 5.0 + m_friction_coeff * (rpm / 1000.0); // base + friction
+	return 5.0 + m_friction_coeff * (rpm / 1000.0);
 }
 
 double GasEngine::engine_torque(double rpm) {
 	double displacement_liters = GasEngine::displacement_liters();
 
-	// naturally aspirated peak torque
 	double torque_peak = k_nm_per_liter * displacement_liters;
 
 	double bore_stroke_ratio = m_bore / m_stroke;
@@ -28,10 +27,8 @@ double GasEngine::engine_torque(double rpm) {
 	double torque_NA_full = torque_peak * exp(-0.5 * x * x);
 
 	// turbo spool proportion
-	double spool = 1.0 / (1.0 + exp((m_spool_rpm - rpm) / m_spool_k));
-
-	// boost pressure in bar
-	double boost_bar = m_wastegate_bar * spool;
+	double spool_proportion = 1.0 / (1.0 + exp((m_spool_rpm - rpm) / m_spool_k));
+	double boost_bar = m_wastegate_bar * spool_proportion;
 
 	// multiply volumetric efficiency for turbo torque
 	double torque_turbo_full = torque_NA_full * (1.0f + boost_bar);
@@ -47,7 +44,8 @@ double GasEngine::engine_torque(double rpm) {
 }
 
 void GasEngine::update_rpm(double delta) {
-	double engine_net_torque = engine_torque(m_current_rpm) - m_reflected_load;
+	double engine_net_torque =
+		engine_torque(m_current_rpm) - m_reflected_load;
 
 	// Closed-throttle engine drag
 	if (m_throttle < 0.02) {
@@ -55,8 +53,7 @@ void GasEngine::update_rpm(double delta) {
 	}
 
 	double engine_alpha = engine_net_torque / Math::max(m_inertia, 0.001);
-	double engine_omega = m_current_rpm * (Math_TAU / 60.0); // "60.0" converts rpm to rads
-	//
+	double engine_omega = m_current_rpm * (Math_TAU / 60.0);
 	engine_omega += engine_alpha * delta;
 
 	double idle_omega = m_idle_rpm * (Math_TAU / 60.0);

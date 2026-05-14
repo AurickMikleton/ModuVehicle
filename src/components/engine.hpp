@@ -77,7 +77,7 @@ public:
 
 	// Idle + Redline + Throttle
 	void set_idle_rpm(double v);
-	double get_idle_rpm() const override;
+	double get_idle_rpm() const;
 	void set_redline_rpm(double v);
 	double get_redline_rpm() const;
 	void set_throttle(double v) override;

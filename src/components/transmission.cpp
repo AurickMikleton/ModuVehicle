@@ -1,10 +1,16 @@
 #include "transmission.hpp"
+#include <godot_cpp/variant/utility_functions.hpp>
 
 float MoVeTransmission::clutch_engagement(float engine_rpm) const {
 	float t = (engine_rpm - m_clutch_engage_rpm) /
 			(m_clutch_full_rpm - m_clutch_engage_rpm);
 	t = Math::clamp(t, 0.0f, 1.0f);
-	return t * t * (3.0f - 2.0f * t);
+	t = t * t * (3.0f - 2.0f * t);
+
+
+	UtilityFunctions::print(vformat("clutch_engagement=%.2f", t));
+
+	return t;
 }
 
 float MoVeTransmission::clutch_capacity(float engine_rpm) const {
@@ -52,6 +58,18 @@ MoVeTransmission::MoVeTransmission() {
 	m_gear_ratios[5] = 1.0f; // 4th
 }
 
+void MoVeTransmission::set_clutch_engage_rpm(float p_rpm) { m_clutch_engage_rpm = p_rpm; }
+float MoVeTransmission::get_clutch_engage_rpm() const { return m_clutch_engage_rpm; }
+
+void MoVeTransmission::set_clutch_full_rpm(float p_rpm) { m_clutch_full_rpm = p_rpm; }
+float MoVeTransmission::get_clutch_full_rpm() const { return m_clutch_full_rpm; }
+
+void MoVeTransmission::set_clutch_max_torque(float p_torque) { m_clutch_max_torque = p_torque; }
+float MoVeTransmission::get_clutch_max_torque() const { return m_clutch_max_torque; }
+
+void MoVeTransmission::set_clutch_k(float p_k) { m_clutch_k = p_k; }
+float MoVeTransmission::get_clutch_k() const { return m_clutch_k; }
+
 void MoVeTransmission::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("shift_up"), &MoVeTransmission::shift_up);
 	ClassDB::bind_method(D_METHOD("shift_down"), &MoVeTransmission::shift_down);
@@ -68,4 +86,21 @@ void MoVeTransmission::_bind_methods() {
 				 "set_gear_ratios", "get_gear_ratios");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "final_drive"),
 				 "set_final_drive", "get_final_drive");
+
+	ClassDB::bind_method(D_METHOD("set_clutch_engage_rpm", "value"), &MoVeTransmission::set_clutch_engage_rpm);
+	ClassDB::bind_method(D_METHOD("get_clutch_engage_rpm"), &MoVeTransmission::get_clutch_engage_rpm);
+
+	ClassDB::bind_method(D_METHOD("set_clutch_full_rpm", "value"), &MoVeTransmission::set_clutch_full_rpm);
+	ClassDB::bind_method(D_METHOD("get_clutch_full_rpm"), &MoVeTransmission::get_clutch_full_rpm);
+
+	ClassDB::bind_method(D_METHOD("set_clutch_max_torque", "value"), &MoVeTransmission::set_clutch_max_torque);
+	ClassDB::bind_method(D_METHOD("get_clutch_max_torque"), &MoVeTransmission::get_clutch_max_torque);
+
+	ClassDB::bind_method(D_METHOD("set_clutch_k", "value"), &MoVeTransmission::set_clutch_k);
+	ClassDB::bind_method(D_METHOD("get_clutch_k"), &MoVeTransmission::get_clutch_k);
+
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "clutch_engage_rpm"), "set_clutch_engage_rpm", "get_clutch_engage_rpm");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "clutch_full_rpm"), "set_clutch_full_rpm", "get_clutch_full_rpm");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "clutch_max_torque"), "set_clutch_max_torque", "get_clutch_max_torque");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "clutch_k"), "set_clutch_k", "get_clutch_k");
 }

@@ -19,7 +19,5 @@ public:
 	virtual double get_throttle() const = 0;
 	virtual void set_throttle(double value) = 0;
 
-	virtual double get_idle_rpm() const = 0;
-
 	virtual double get_current_rpm() const = 0;
 };

@@ -39,4 +39,16 @@ public:
 	TypedArray<float> get_gear_ratios() const;
 	void set_final_drive(float value);
 	float get_final_drive() const;
+
+	void set_clutch_engage_rpm(float value);
+	float get_clutch_engage_rpm() const;
+
+	void set_clutch_full_rpm(float value);
+	float get_clutch_full_rpm() const;
+
+	void set_clutch_max_torque(float value);
+	float get_clutch_max_torque() const;
+
+	void set_clutch_k(float value);
+	float get_clutch_k() const;
 };
