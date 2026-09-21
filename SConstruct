@@ -37,6 +37,16 @@ Run the following command to download godot-cpp:
 
 env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
+# Remove inherited C++ standard flags, preserving other compiler options.
+for key in ("CCFLAGS", "CXXFLAGS"):
+    env[key] = [
+        flag for flag in env.get(key, [])
+        if not str(flag).startswith(("-std=c++", "-std=gnu++"))
+    ]
+
+env.Append(CXXFLAGS=["-std=c++26"])
+# End
+
 env.Append(CPPPATH=["src/"])
 
 sources = []
