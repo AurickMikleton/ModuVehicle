@@ -35,14 +35,14 @@ private:
     double boost_threshold_rpm {2500.0};
 
     // Supercharger
-    // 0 = None, 1 = Roots, 2 = Centrifugal.
+    // 0 = None, 1 = Roots, 2 = Centrifugal
     int64_t supercharger_type {0};
     double supercharger_max_boost_bar {0.6};
-    // Boost fraction reached near idle by a positive-displacement blower.
+    // Boost fraction near idle
     double roots_low_rpm_boost_fraction {0.75};
-    // Converts pressure ratio to torque gain, approximating charge heating/losses.
+    // Converts pressure ratio to torque gain
     double supercharger_charge_efficiency {0.8};
-    // Belt-drive power demand at redline and full load, in kW.
+    // Belt-drive power demand at redline and full load
     double supercharger_drive_loss_kw {12.0};
 
 protected:
