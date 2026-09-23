@@ -46,7 +46,7 @@ for key in ("CCFLAGS", "CXXFLAGS"):
 
 env.Append(CXXFLAGS=["-std=c++26"])
 # End
-
+env.Append(CPPPATH=["#src"])
 env.Append(CPPPATH=["src/"])
 
 sources = []

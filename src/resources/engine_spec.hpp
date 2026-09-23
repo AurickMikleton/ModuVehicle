@@ -12,7 +12,7 @@ namespace godot {
 class EngineSpec final : public Resource {
     GDCLASS(EngineSpec, Resource)
 
-private:
+public:
     String display_name = "Engine";
 
     // Operating range

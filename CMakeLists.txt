@@ -26,6 +26,10 @@ if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/godot-cpp/src")
 endif()
 add_subdirectory(godot-cpp SYSTEM)
 
+target_include_directories(your_target PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+
 # Add godot-cpp's module path and include the exported functions.
 # This is made available for documentation generation
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${godot-cpp_SOURCE_DIR}/cmake")
