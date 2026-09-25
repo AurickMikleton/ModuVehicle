@@ -14,7 +14,7 @@ namespace godot {
 class SuspensionSpec : public Resource {
     GDCLASS(SuspensionSpec, Resource)
 
-private:
+public:
     String display_name = "Sport suspension";
     double rest_length = 0.34;
     double travel = 0.20;

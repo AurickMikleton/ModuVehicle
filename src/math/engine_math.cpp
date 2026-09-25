@@ -38,7 +38,7 @@
 
 		shape = std::lerp(spec.roots_low_rpm_boost_fraction, 1.0, progress);
 	}
-	return spec.supercharger_boost_bar * shape * std::clamp(throttle, 0.0, 1.0);
+	return spec.supercharger_max_boost_bar * shape * std::clamp(throttle, 0.0, 1.0);
 }
 
 [[nodiscard]] double supercharger_drag_nm(double rpm, double throttle, const godot::EngineSpec &spec) {
