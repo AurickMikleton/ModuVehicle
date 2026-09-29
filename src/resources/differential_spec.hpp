@@ -14,7 +14,7 @@ namespace godot {
 class DifferentialSpec : public Resource {
     GDCLASS(DifferentialSpec, Resource)
 
-private:
+public:
     String display_name = "Limited-slip differential";
     double final_drive = 3.90;
     double efficiency = 0.96;
