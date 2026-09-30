@@ -14,7 +14,7 @@ namespace godot {
 class AeroSpec : public Resource {
     GDCLASS(AeroSpec, Resource)
 
-private:
+public:
     String display_name = "Road-car aero";
     double drag_coefficient = 0.34;
     double frontal_area_m2 = 2.15;

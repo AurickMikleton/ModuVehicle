@@ -1,0 +1,20 @@
+#include "resources/aero_spec.hpp"
+#include <godot_cpp/variant/vector3.hpp>
+
+inline constexpr double k_air_density {1.225};
+
+[[nodiscard]] godot::Vector3 drag_force(godot::Vector3 velocity, const godot::AeroSpec &spec) {
+	const double speed {velocity.length()};
+	if (speed < 1e-2) return godot::Vector3{};
+	const double magnitude {0.5 * k_air_density * spec.drag_coefficient * spec.frontal_area_m2 * speed * speed};
+	return -velocity.normalized() * magnitude;
+}
+
+[[nodiscard]] double downforce(double speed, const godot::AeroSpec &spec) {
+	return 0.5
+		* k_air_density
+		* spec.downforce_coefficient
+		* spec.frontal_area_m2
+		* speed
+		* speed;
+}
