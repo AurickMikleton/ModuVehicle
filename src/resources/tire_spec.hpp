@@ -14,7 +14,7 @@ namespace godot {
 class TireSpec : public Resource {
     GDCLASS(TireSpec, Resource)
 
-private:
+public:
     String display_name = "Sport tire";
     double friction_coefficient = 1.08;
     // Force slope in N per unit slip at the reference load.

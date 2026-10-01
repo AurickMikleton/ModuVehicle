@@ -14,7 +14,7 @@ namespace godot {
 class AssistSpec : public Resource {
     GDCLASS(AssistSpec, Resource)
 
-private:
+public:
     bool traction_control = true;
     double target_drive_slip = 0.14;
     // Legacy preset compatibility; the implicit traction torque cap uses target_drive_slip.
