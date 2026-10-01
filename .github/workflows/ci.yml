@@ -66,6 +66,24 @@ jobs:
           platform: ${{ matrix.target.platform }}
           em-version: 3.1.62
 
+      - name: Setup Windows GCC
+        if: ${{ matrix.target.platform == 'windows' }}
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-scons
+
+      - name: Setup newer Android NDK
+        if: ${{ matrix.target.platform == 'android' }}
+        id: android-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r28c
+          add-to-path: false
 
       # Install GCC 14
       - name: Install and select GCC 14
@@ -89,11 +107,39 @@ jobs:
           cache-name: ${{ matrix.target.platform }}_${{ matrix.target.arch }}_${{ matrix.float-precision }}_${{ matrix.target-type }}
 
       - name: Build GDExtension Debug Build
+        if: ${{ matrix.target.platform != 'windows' }}
         shell: sh
         env:
           SCONS_CACHE: ${{ github.workspace }}/.scons-cache/
+          ANDROID_NDK_ROOT: ${{ steps.android-ndk.outputs.ndk-path }}
+          TARGET_PLATFORM: ${{ matrix.target.platform }}
         run: |
-          scons target=${{ matrix.target-type }} platform=${{ matrix.target.platform }} arch=${{ matrix.target.arch }} precision=${{ matrix.float-precision }}
+          set -- \
+            target=${{ matrix.target-type }} \
+            platform=${{ matrix.target.platform }} \
+            arch=${{ matrix.target.arch }} \
+            precision=${{ matrix.float-precision }}
+
+          if [ "$TARGET_PLATFORM" = "android" ]; then
+            set -- "$@" "ANDROID_HOME="
+            "$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" --version
+          fi
+
+          scons "$@"
+
+      - name: Build GDExtension Windows
+        if: ${{ matrix.target.platform == 'windows' }}
+        shell: msys2 {0}
+        env:
+          SCONS_CACHE: ${{ github.workspace }}/.scons-cache/
+        run: |
+          g++ --version
+          scons \
+            target=${{ matrix.target-type }} \
+            platform=windows \
+            arch=${{ matrix.target.arch }} \
+            precision=${{ matrix.float-precision }} \
+            use_mingw=yes
 
       - name: Save .scons_cache
         uses: ./godot-cpp/.github/actions/godot-cache-save
