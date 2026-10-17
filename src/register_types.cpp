@@ -10,6 +10,19 @@
 #include "components/transmission.hpp"
 #include "components/wheel.hpp"
 
+#include "resources/aero_spec.hpp"
+#include "resources/assist_spec.hpp"
+#include "resources/chassis_spec.hpp"
+#include "resources/differential_spec.hpp"
+#include "resources/engine_sound_layout.hpp"
+#include "resources/engine_spec.hpp"
+#include "resources/gearbox_spec.hpp"
+#include "resources/suspension_spec.hpp"
+#include "resources/tire_spec.hpp"
+#include "resources/vehicle_assembly.hpp"
+#include "resources/vehicle_audio_spec.hpp"
+#include "resources/wheel_module_spec.hpp"
+
 #include "include.hpp"
 
 using namespace godot;
@@ -25,6 +38,21 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level) {
 	GDREGISTER_CLASS(MoVeCar);
 	GDREGISTER_CLASS(MoVeExhaust);
 	GDREGISTER_CLASS(MoVeTransmission);
+
+	// New ModuVehicle Resources
+
+	GDREGISTER_CLASS(AeroSpec);
+	GDREGISTER_CLASS(AssistSpec);
+	GDREGISTER_CLASS(ChassisSpec);
+	GDREGISTER_CLASS(DifferentialSpec);
+	GDREGISTER_CLASS(EngineSoundLayout);
+	GDREGISTER_CLASS(EngineSpec);
+	GDREGISTER_CLASS(GearboxSpec);
+	GDREGISTER_CLASS(SuspensionSpec);
+	GDREGISTER_CLASS(TireSpec);
+	GDREGISTER_CLASS(VehicleAssembly);
+	GDREGISTER_CLASS(VehicleAudioSpec);
+	GDREGISTER_CLASS(WheelModuleSpec);
 }
 
 void uninitialize_gdextension_types(ModuleInitializationLevel p_level) {
