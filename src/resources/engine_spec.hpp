@@ -47,6 +47,7 @@ public:
 
 protected:
     static void _bind_methods();
+    Variant _get_inspector_category() const;
 
 public:
     EngineSpec();

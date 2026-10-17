@@ -1,0 +1,6 @@
+[gd_resource type="EngineSoundLayout" format=3 uid="uid://fsvfkg88meor"]
+
+[resource]
+display_name = "Parallel-Twin"
+cylinders = 2
+firing_pattern = PackedFloat32Array(1, 1.12)

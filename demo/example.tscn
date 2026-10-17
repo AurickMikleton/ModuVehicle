@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="GasEngine" uid="uid://d2020b0cq84qh" path="res://new_gas_engine.tres" id="1_ugfer"]
 [ext_resource type="Script" uid="uid://cdhpi1ulpmdub" path="res://mo_ve_car.gd" id="2_n51mc"]
@@ -58,9 +58,9 @@ sky_material = SubResource("ProceduralSkyMaterial_n51mc")
 background_mode = 2
 sky = SubResource("Sky_8lvy3")
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=733415741]
 
-[node name="MoVeCar" type="MoVeCar" parent="."]
+[node name="MoVeCar" type="MoVeCar" parent="." unique_id=751251142]
 engine = ExtResource("1_ugfer")
 transmission = SubResource("MoVeTransmission_n51mc")
 wheels = Array[NodePath]([NodePath("RearLeft"), NodePath("RearRight"), NodePath("FrontLeft"), NodePath("FrontRight")])
@@ -70,86 +70,86 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, -0.5, 0)
 script = ExtResource("2_n51mc")
 
-[node name="RearLeft" type="MoVeWheel" parent="MoVeCar"]
+[node name="RearLeft" type="MoVeWheel" parent="MoVeCar" unique_id=1534467598]
 is_powered = true
 spring_strength = 50000.0
 spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, 1)
 
-[node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearLeft"]
+[node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearLeft" unique_id=2145258651]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
 surface_material_override/0 = SubResource("StandardMaterial3D_rujmf")
 
-[node name="RearRight" type="MoVeWheel" parent="MoVeCar"]
+[node name="RearRight" type="MoVeWheel" parent="MoVeCar" unique_id=373659006]
 is_powered = true
 spring_strength = 50000.0
 spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, 1)
 
-[node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearRight"]
+[node name="wheel" type="MeshInstance3D" parent="MoVeCar/RearRight" unique_id=1667588049]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
 surface_material_override/0 = SubResource("StandardMaterial3D_wcwec")
 
-[node name="FrontLeft" type="MoVeWheel" parent="MoVeCar"]
+[node name="FrontLeft" type="MoVeWheel" parent="MoVeCar" unique_id=1968269063]
 spring_strength = 50000.0
 spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -1)
 
-[node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontLeft"]
+[node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontLeft" unique_id=1682823306]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
 surface_material_override/0 = SubResource("StandardMaterial3D_kkclv")
 
-[node name="FrontRight" type="MoVeWheel" parent="MoVeCar"]
+[node name="FrontRight" type="MoVeWheel" parent="MoVeCar" unique_id=1515270797]
 spring_strength = 50000.0
 spring_damping = 1000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -1)
 
-[node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontRight"]
+[node name="wheel" type="MeshInstance3D" parent="MoVeCar/FrontRight" unique_id=165824678]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_n51mc")
 surface_material_override/0 = SubResource("StandardMaterial3D_ugfer")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="MoVeCar"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MoVeCar" unique_id=35124828]
 mesh = SubResource("BoxMesh_n51mc")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="MoVeCar"]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MoVeCar" unique_id=764727845]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3996594, 0.31700706)
 mesh = SubResource("BoxMesh_ei00m")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MoVeCar"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MoVeCar" unique_id=1073614638]
 shape = SubResource("ConvexPolygonShape3D_n51mc")
 
-[node name="MoVeExhaust" type="MoVeExhaust" parent="MoVeCar"]
+[node name="MoVeExhaust" type="MoVeExhaust" parent="MoVeCar" unique_id=1259302245]
 engine = ExtResource("1_ugfer")
 stream = SubResource("AudioStreamGenerator_8lvy3")
 script = ExtResource("3_8lvy3")
 
-[node name="chase point" type="Node3D" parent="MoVeCar"]
+[node name="chase point" type="Node3D" parent="MoVeCar" unique_id=2110786225]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1692832, 6.7296333)
 
-[node name="floor" type="MeshInstance3D" parent="."]
+[node name="floor" type="MeshInstance3D" parent="." unique_id=358234041]
 mesh = SubResource("BoxMesh_2jas5")
 surface_material_override/0 = SubResource("StandardMaterial3D_ei00m")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="floor"]
+[node name="StaticBody3D" type="StaticBody3D" parent="floor" unique_id=538870006]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/StaticBody3D" unique_id=538466711]
 shape = SubResource("ConcavePolygonShape3D_ugfer")
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=359543234]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20.908703, 6.763218, 0)
 script = ExtResource("5_ei00m")
 target_path = NodePath("../MoVeCar")
 distance = -6.0
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2144022093]
 environment = SubResource("Environment_wcwec")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1077674495]
 scale = Vector2(0.5, 0.5)
 transform = Transform2D(0.5, 0, 0, 0.5, 0, 0)
 
-[node name="Graph" parent="CanvasLayer" instance=ExtResource("6_ugfer")]
+[node name="Graph" parent="CanvasLayer" unique_id=41614340 instance=ExtResource("6_ugfer")]

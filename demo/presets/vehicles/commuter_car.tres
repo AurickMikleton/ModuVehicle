@@ -1,0 +1,10 @@
+[gd_resource type="VehicleAssembly" format=3 uid="uid://dxoru2flrdi86"]
+
+[ext_resource type="ChassisSpec" uid="uid://dfn3ev37afsnc" path="res://presets/components/commuter_car/chassis.tres" id="1_i22fg"]
+
+[resource]
+display_name = "Commuter Car"
+chassis = ExtResource("1_i22fg")
+maximum_steering_degrees = 32.0
+service_brake_torque_nm = 3300.0
+handbrake_torque_nm = 4000.0

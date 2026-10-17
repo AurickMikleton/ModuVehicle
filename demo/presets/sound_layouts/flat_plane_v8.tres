@@ -1,0 +1,6 @@
+[gd_resource type="EngineSoundLayout" format=3 uid="uid://dahkjxvk5looo"]
+
+[resource]
+display_name = "Flat-plane V8"
+cylinders = 8
+firing_pattern = PackedFloat32Array(1, 0.985, 1.015, 1, 1, 1.015, 0.985, 1)

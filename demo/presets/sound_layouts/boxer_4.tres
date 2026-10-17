@@ -1,0 +1,5 @@
+[gd_resource type="EngineSoundLayout" format=3 uid="uid://djrnn0v3fgsm"]
+
+[resource]
+display_name = "Boxer-4"
+firing_pattern = PackedFloat32Array(1, 0.82, 1.28, 0.96)

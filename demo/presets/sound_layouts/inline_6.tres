@@ -1,0 +1,6 @@
+[gd_resource type="EngineSoundLayout" format=3 uid="uid://csj3ted1c325f"]
+
+[resource]
+display_name = "Inline-6"
+cylinders = 6
+firing_pattern = PackedFloat32Array(1, 0.99, 1.01, 1, 1.01, 0.99)

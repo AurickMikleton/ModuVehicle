@@ -1,0 +1,6 @@
+[gd_resource type="EngineSpec" format=3 uid="uid://b1fnbg2qq1m7t"]
+
+[resource]
+redline_rpm = 6200.0
+rotational_inertia = 0.38
+engine_braking_nm = 55.0

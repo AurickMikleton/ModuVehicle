@@ -13,13 +13,16 @@ EngineSpec::EngineSpec() {
 }
 
 void EngineSpec::_bind_methods() {
-    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Identity", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_CATEGORY), "", "");
+    ClassDB::bind_method(D_METHOD("_get_inspector_category"), &EngineSpec::_get_inspector_category);
+    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Identity", PROPERTY_HINT_NONE,
+        "", PROPERTY_USAGE_CATEGORY), "", "_get_inspector_category");
 
     ClassDB::bind_method(D_METHOD("set_display_name", "value"), &EngineSpec::set_display_name);
     ClassDB::bind_method(D_METHOD("get_display_name"), &EngineSpec::get_display_name);
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "display_name"), "set_display_name", "get_display_name");
 
-    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Operating range", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_CATEGORY), "", "");
+    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Operating range", PROPERTY_HINT_NONE,
+		"", PROPERTY_USAGE_CATEGORY), "", "_get_inspector_category");
 
     ClassDB::bind_method(D_METHOD("set_idle_rpm", "value"), &EngineSpec::set_idle_rpm);
     ClassDB::bind_method(D_METHOD("get_idle_rpm"), &EngineSpec::get_idle_rpm);
@@ -45,7 +48,8 @@ void EngineSpec::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_engine_braking_exponent"), &EngineSpec::get_engine_braking_exponent);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "engine_braking_exponent", PROPERTY_HINT_RANGE, "0.5,3,0.05"), "set_engine_braking_exponent", "get_engine_braking_exponent");
 
-    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Torque curve", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_CATEGORY), "", "");
+    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Toruqe curve", PROPERTY_HINT_NONE,
+		"", PROPERTY_USAGE_CATEGORY), "", "_get_inspector_category");
 
     ClassDB::bind_method(D_METHOD("set_torque_samples", "value"), &EngineSpec::set_torque_samples);
     ClassDB::bind_method(D_METHOD("get_torque_samples"), &EngineSpec::get_torque_samples);
@@ -59,7 +63,8 @@ void EngineSpec::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_torque_multiplier"), &EngineSpec::get_torque_multiplier);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "torque_multiplier", PROPERTY_HINT_RANGE, "0,10,0.05"), "set_torque_multiplier", "get_torque_multiplier");
 
-    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Forced induction", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_CATEGORY), "", "");
+    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Forced induction", PROPERTY_HINT_NONE,
+		"", PROPERTY_USAGE_CATEGORY), "", "_get_inspector_category");
 
     ClassDB::bind_method(D_METHOD("set_turbocharged", "value"), &EngineSpec::set_turbocharged);
     ClassDB::bind_method(D_METHOD("get_turbocharged"), &EngineSpec::get_turbocharged);
@@ -73,7 +78,8 @@ void EngineSpec::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_boost_threshold_rpm"), &EngineSpec::get_boost_threshold_rpm);
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "boost_threshold_rpm", PROPERTY_HINT_RANGE, "500,8000,50"), "set_boost_threshold_rpm", "get_boost_threshold_rpm");
 
-    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Supercharger physics", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_CATEGORY), "", "");
+    ADD_PROPERTY(PropertyInfo(Variant::NIL, "Supercharger physics", PROPERTY_HINT_NONE,
+		"", PROPERTY_USAGE_CATEGORY), "", "_get_inspector_category");
 
     ClassDB::bind_method(D_METHOD("set_supercharger_type", "value"), &EngineSpec::set_supercharger_type);
     ClassDB::bind_method(D_METHOD("get_supercharger_type"), &EngineSpec::get_supercharger_type);
@@ -278,3 +284,6 @@ double EngineSpec::get_supercharger_drive_loss_kw() const {
 
 } // namespace godot
 
+godot::Variant godot::EngineSpec::_get_inspector_category() const {
+    return Variant();
+}

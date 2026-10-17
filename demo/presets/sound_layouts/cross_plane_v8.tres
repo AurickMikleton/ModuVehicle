@@ -1,0 +1,6 @@
+[gd_resource type="EngineSoundLayout" format=3 uid="uid://tx7lhqlvssgf"]
+
+[resource]
+display_name = "Cross-plane V8"
+cylinders = 8
+firing_pattern = PackedFloat32Array(1.067, 0.889, 1.133, 0.933, 0.911, 1.111, 0.844, 1.111)
